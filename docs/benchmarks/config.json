@@ -1,51 +1,81 @@
 {
   "intro_what": "An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; a 135M-parameter multilingual span model plus validated rules find prompt-injection text inside the data and replace each span with [stripped], while orders, totals, names and JSON structure survive untouched.",
-  "intro_alternative": "Llama Prompt Guard 2 90M (Meta) reaches 0.0% escape only by discarding 100% of flagged documents — the agent loses the data it was reading; see the frontier chart.",
+  "intro_alternative": "Llama Prompt Guard 2 90M (Meta) reaches 0.0% escape only by discarding 100% of flagged documents \u2014 the agent loses the data it was reading; see the frontier chart.",
   "intro_measured": "Committed run records per system and set (eval/results/), fictional data only, an external public set for generalization, per-attack-family heatmaps, CPU latency measured where each system ran, and a cost ledger. Rerun everything with `make eval` + the Kaggle kernels in training/train/.",
   "latency_note": "measured where each system ran (p50 per document): local systems on Kaggle CPU, 4 threads; the LLM column includes network round-trip",
-  "cost_note": "LLM-based guarding pays per token; local guards pay $0 per document — computed from recorded token usage at Baseten list prices",
+  "cost_note": "LLM-based guarding pays per token; local guards pay $0 per document \u2014 computed from recorded token usage at Baseten list prices",
   "set_order": {
-    "handwritten": "Hand-written attacks · 62 docs (en+de+hu)",
-    "agent-traffic": "Agent traffic · 900 docs (synthetic tool output)",
-    "public-deepset": "Public prompts · 452 docs (deepset, external)"
+    "handwritten": "Hand-written attacks \u00b7 62 docs (en+de+hu)",
+    "agent-traffic": "Agent traffic \u00b7 900 docs (synthetic tool output)",
+    "public-deepset": "Public prompts \u00b7 452 docs (deepset, external)"
   },
   "axes": {
     "handwritten": {
-      "frontier_title": "Escape rate against over-stripping — hand-written set (62 docs)",
-      "heatmap_title": "Escape rate by attack family — hand-written set",
-      "language_title": "Escape rate by language — hand-written set",
-      "f1_title": "Doc-level detection F1 — hand-written set",
+      "frontier_title": "Escape rate against over-stripping \u2014 hand-written set (62 docs)",
+      "heatmap_title": "Escape rate by attack family \u2014 hand-written set",
+      "language_title": "Escape rate by language \u2014 hand-written set",
+      "f1_title": "Doc-level detection F1 \u2014 hand-written set",
       "overstrip_max": 1.0,
       "escape_max": 1.0
     },
     "agent-traffic": {
-      "frontier_title": "Escape rate against over-stripping — agent traffic (900 docs)",
-      "heatmap_title": "Escape rate by attack family — agent traffic",
-      "language_title": "Escape rate by language — agent traffic",
-      "f1_title": "Doc-level detection F1 — agent traffic",
+      "frontier_title": "Escape rate against over-stripping \u2014 agent traffic (900 docs)",
+      "heatmap_title": "Escape rate by attack family \u2014 agent traffic",
+      "language_title": "Escape rate by language \u2014 agent traffic",
+      "f1_title": "Doc-level detection F1 \u2014 agent traffic",
       "overstrip_max": 1.0,
       "escape_max": 1.0
     },
     "public-deepset": {
-      "frontier_title": "Escape rate against over-stripping — public prompt set (452 docs)",
-      "heatmap_title": "Escape rate by attack family — public prompt set",
-      "language_title": "Escape rate by language — public prompt set",
-      "f1_title": "Doc-level detection F1 — public prompt set",
+      "frontier_title": "Escape rate against over-stripping \u2014 public prompt set (452 docs)",
+      "heatmap_title": "Escape rate by attack family \u2014 public prompt set",
+      "language_title": "Escape rate by language \u2014 public prompt set",
+      "f1_title": "Doc-level detection F1 \u2014 public prompt set",
       "overstrip_max": 1.0,
       "escape_max": 1.0
     }
   },
   "families": [
-    { "id": "override", "label": "override / instruction replacement" },
-    { "id": "impersonation", "label": "system or role impersonation" },
-    { "id": "forgery", "label": "forged tool results / trusted blocks" },
-    { "id": "exfil-secret", "label": "secret hunting (.env, keys)" },
-    { "id": "exfil-url", "label": "exfiltration to URL / email" },
-    { "id": "encoding-b64", "label": "base64-encoded instruction" },
-    { "id": "encoding-hex", "label": "hex-encoded instruction" },
-    { "id": "smuggle-unicode", "label": "invisible-unicode smuggling" },
-    { "id": "smuggle-homoglyph", "label": "homoglyph / mixed script" },
-    { "id": "narrative", "label": "note-to-the-assistant narrative" }
+    {
+      "id": "override",
+      "label": "override / instruction replacement"
+    },
+    {
+      "id": "impersonation",
+      "label": "system or role impersonation"
+    },
+    {
+      "id": "forgery",
+      "label": "forged tool results / trusted blocks"
+    },
+    {
+      "id": "exfil-secret",
+      "label": "secret hunting (.env, keys)"
+    },
+    {
+      "id": "exfil-url",
+      "label": "exfiltration to URL / email"
+    },
+    {
+      "id": "encoding-b64",
+      "label": "base64-encoded instruction"
+    },
+    {
+      "id": "encoding-hex",
+      "label": "hex-encoded instruction"
+    },
+    {
+      "id": "smuggle-unicode",
+      "label": "invisible-unicode smuggling"
+    },
+    {
+      "id": "smuggle-homoglyph",
+      "label": "homoglyph / mixed script"
+    },
+    {
+      "id": "narrative",
+      "label": "note-to-the-assistant narrative"
+    }
   ],
   "systems": [
     {
@@ -94,11 +124,12 @@
     },
     {
       "tag": "llm-self-detect",
-      "label": "Muse Spark Open self-detect",
-      "short": "LLM",
+      "label": "Qwen2.5-0.5B self-detect (local CPU)",
+      "short": "LLM 0.5B",
       "color": "#cf222e",
       "color_dark": "#f85149",
-      "cost_usd_per_1m_docs": 2900
+      "cost_usd_per_1m_docs": null,
+      "latency_p50_ms": null
     },
     {
       "tag": "spanguard-audit",
@@ -108,6 +139,24 @@
       "color_dark": "#4493f8",
       "required": false,
       "cost_usd_per_1m_docs": null
+    },
+    {
+      "tag": "spanguard-docguard",
+      "label": "spanguard docguard (doc classifier)",
+      "short": "SG doc",
+      "color": "#3fb950",
+      "color_dark": "#3fb950",
+      "required": false,
+      "cost_usd_per_1m_docs": 0
+    },
+    {
+      "tag": "spanguard-toolguard",
+      "label": "spanguard toolguard (tool-call args)",
+      "short": "SG tool",
+      "color": "#f0883e",
+      "color_dark": "#f0883e",
+      "required": false,
+      "cost_usd_per_1m_docs": 0
     }
   ]
 }

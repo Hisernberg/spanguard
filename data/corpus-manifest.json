@@ -1,0 +1,66 @@
+{
+  "generator": "training/gen_corpus.py",
+  "deterministic": true,
+  "seeds": {
+    "train": 101,
+    "dev": 202,
+    "test": 303
+  },
+  "fictional_only": true,
+  "splits": {
+    "train": {
+      "docs": 4200,
+      "attacked": 2574,
+      "negatives": 448,
+      "clean": 1178,
+      "sha256": "86e02788cf4b11d54fc815636ca0226f506a60ba4c2d5864dbc26292b19952ae"
+    },
+    "dev": {
+      "docs": 450,
+      "attacked": 274,
+      "negatives": 50,
+      "clean": 126,
+      "sha256": "34a34a407bc99cd3f4e5332df3d7f420e3455f05187c6a0122e793b92d11dd85"
+    },
+    "test": {
+      "docs": 900,
+      "attacked": 479,
+      "negatives": 109,
+      "clean": 312,
+      "sha256": "5ada5c4e0dbc50ae7286795df42eb2fbd5b4877d8ce513645aab621a8d55d6cb"
+    }
+  },
+  "teacher": {
+    "model": "meta-models/muse-spark-open-1026",
+    "base_url": "https://inference.baseten.co/v1",
+    "price_usd_per_1m": {
+      "input": 1.25,
+      "cached_input": 0.15,
+      "output": 4.25
+    },
+    "splits": {
+      "train": {
+        "sampled": 1000,
+        "written": 1000,
+        "planted_and_teacher_found": 369,
+        "planted_missed_by_teacher": 221,
+        "teacher_only": 0
+      },
+      "dev": {
+        "sampled": 150,
+        "written": 150,
+        "planted_and_teacher_found": 54,
+        "planted_missed_by_teacher": 38,
+        "teacher_only": 0
+      }
+    },
+    "usage": {
+      "prompt_tokens": 474250,
+      "completion_tokens": 781412,
+      "calls": 1150,
+      "errors": 0
+    },
+    "cost_usd": 3.9138,
+    "agreement": {}
+  }
+}
