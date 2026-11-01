@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+data/corpus/train.jsonl
+data/corpus/dev.jsonl
+data/corpus/labelled/
+data/corpus/test.jsonl
+!data/corpus/test.jsonl
+.env
+.venv/
+.ipynb_checkpoints/
