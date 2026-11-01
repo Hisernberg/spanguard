@@ -71,11 +71,29 @@ def external_system(record: dict, tag: str):
 
 
 def llm_selfdetect_system(limit: int | None = None, concurrency: int = 4):
-    """Muse Spark Open asked to self-detect (expensive; used as the 'just ask the LLM' baseline)."""
+    """LLM self-detection baseline. Reads the precomputed verdicts sidecar when
+    present (training/eval_llm_detect.py); falls back to live calls otherwise."""
+    from ...types import Finding, Result  # noqa: PLC0415
+
+    sidecar = RESULTS / "llm-self-detect" / "verdicts.json"
+    verdicts: dict = {}
+    if sidecar.exists():
+        verdicts = json.loads(sidecar.read_text()).get("verdicts", {})
+
+    if verdicts:
+        def fn(doc: dict):
+            findings = [Finding(start=s["start"], end=s["end"], length=s["end"] - s["start"],
+                                kind=s.get("family", "override"), source="llm-self", confidence=1.0, sha256="")
+                        for s in verdicts.get(doc["id"], [])]
+            cleaned = doc["text"]
+            for f in sorted(findings, key=lambda x: x.start, reverse=True):
+                cleaned = cleaned[: f.start] + "[stripped]" + cleaned[f.end:]
+            return Result(original=doc["text"], cleaned=cleaned, stripped=findings)
+
+        return fn
+
     sys.path.insert(0, str(REPO / "training"))
     from label_teacher import label_doc, load_key, match_span  # noqa: PLC0415
-
-    from ...types import Finding, Result  # noqa: PLC0415
 
     api_key = load_key()
     client = __import__("httpx").Client()
@@ -120,6 +138,11 @@ def run_eval(systems: list[str], sets: list[str], tag: str | None = None, limit:
             fn = external_system(record, sysname)
         elif sysname == "llm-self-detect":
             fn = llm_selfdetect_system(limit)
+            # restrict to the docs the sidecar actually covers (no silent FNs)
+            covered = RESULTS / "llm-self-detect" / "verdicts.json"
+            if covered.exists():
+                ids = set(json.loads(covered.read_text()).get("verdicts", {}))
+                docs_by_set = {n: [d for d in docs if d["id"] in ids] for n, docs in docs_by_set.items()}
         else:
             raise ValueError(f"unknown system {sysname}")
         t0 = dt.datetime.now(dt.UTC)
