@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-01T19:21:48+00:00",
+  "generated_at": "2026-11-01T19:35:29+00:00",
   "environment": {
     "platform": "local CPU (recovery build)",
     "device": "cpu",
     "threads": 2
   },
   "systems": {
-    "toolguard": {
+    "spanguard-toolguard": {
       "sets": {
         "tool-call-args": {
           "docs": 400,
@@ -14,8 +14,8 @@
           "recall": 1.0,
           "f1": 1.0,
           "false_block_rate": 0.0,
-          "latency_ms_p50": 43.2,
-          "latency_ms_p95": 68.4,
+          "latency_ms_p50": 149.3,
+          "latency_ms_p95": 835.7,
           "per_tool": {
             "create_ticket": {
               "attacks": 39,
@@ -57,7 +57,7 @@
       },
       "model": "Nabidnur/spanguard-toolguard-mdistil"
     },
-    "docguard": {
+    "spanguard-docguard": {
       "sets": {
         "tool-call-args": {
           "docs": 400,
@@ -65,8 +65,8 @@
           "recall": 1.0,
           "f1": 0.8719,
           "false_block_rate": 0.3895,
-          "latency_ms_p50": 54.9,
-          "latency_ms_p95": 72.7,
+          "latency_ms_p50": 140.0,
+          "latency_ms_p95": 848.2,
           "per_tool": {
             "create_ticket": {
               "attacks": 39,

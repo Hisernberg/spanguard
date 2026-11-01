@@ -75,7 +75,7 @@ def main() -> None:
         m = eval_calls(d, rows, max_len)
         print(f"[{name}] rec {m['recall']:.3f} false-block {m['false_block_rate']:.3f} "
               f"F1 {m['f1']:.3f} p50 {m['latency_ms_p50']}ms")
-        systems[name.replace("spanguard-", "")] = {
+        systems[name] = {
             "sets": {"tool-call-args": m},
             "model": f"Nabidnur/{name}-mdistil",
         }

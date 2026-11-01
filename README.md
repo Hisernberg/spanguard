@@ -103,6 +103,17 @@ three are distilled from the same fictional corpus and run on CPU.
 <!-- results:end -->
 
 <!-- toolcall:start -->
+
+### The agent→tool surface (function calls)
+
+Attacks also arrive as tool-call arguments — "send_email(body=... ignore your instructions ...)". The tool-call guard classifies the whole call before it executes; both family models are scored on the same held-out generated set (fictional tools, deterministic seeds), so the specialization is measurable:
+
+| Model | Calls | Block-recall | False-block | F1 | p50 latency |
+|---|---|---|---|---|---|
+| spanguard docguard (doc classifier) | 400 | 100.0% | 39.0% | 87.2% | 140.0 ms |
+| spanguard toolguard (tool-call args) | 400 | 100.0% | 0.0% | 100.0% | 149.3 ms |
+
+Block-recall is recall on malicious calls; false-block is the share of benign calls a gateway would have to reject. This surface is all-or-nothing — a span edit inside a JSON argument is not an option, which is exactly why a dedicated classifier earns its place in the family.
 <!-- toolcall:end -->
 
 ### How to read this
