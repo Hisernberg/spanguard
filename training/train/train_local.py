@@ -91,7 +91,10 @@ class RowDataset(Dataset):
         return len(self.rows)
 
     def __getitem__(self, i):
-        return self.rows[i]
+        r = self.rows[i]
+        return {"input_ids": torch.tensor(r["input_ids"], dtype=torch.long),
+                "attention_mask": torch.tensor(r["attention_mask"], dtype=torch.long),
+                "labels": torch.tensor(r["labels"], dtype=torch.long)}
 
 
 def span_f1_local(model, docs, max_len=MAX_LEN):
@@ -196,7 +199,7 @@ class ClfDataset(Dataset):
         return len(self.labels)
 
     def __getitem__(self, i):
-        item = dict(self.enc[i])
+        item = {k: v[i] for k, v in self.enc.items()}
         item["labels"] = self.labels[i]
         return item
 

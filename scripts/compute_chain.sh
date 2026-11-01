@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Training-first chain: span -> docguard -> toolguard, then LLM detect + baselines.
+# Training chain (fixed datasets): span -> docguard -> toolguard -> llm -> baselines -> family eval
 set -uo pipefail
 cd /home/z/my-project/spanguard
 echo "== $(date +%H:%M) span"
@@ -12,5 +12,7 @@ echo "== $(date +%H:%M) llm detect"
 python3 training/eval_llm_detect.py --agent-limit 300 --public-limit 120 > /tmp/chain-llm.log 2>&1
 echo "== $(date +%H:%M) baselines"
 python3 training/eval_baselines_local.py > /tmp/chain-baselines.log 2>&1
+echo "== $(date +%H:%M) family tool-call eval"
+python3 training/eval_family_toolcall.py > /tmp/chain-family.log 2>&1
 echo "== $(date +%H:%M) CHAIN DONE"
 ls data/models/
