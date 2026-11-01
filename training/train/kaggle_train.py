@@ -25,7 +25,7 @@ STRIDE = 64
 LABELS = ["O", "B-INJ", "I-INJ"]
 LABEL2ID = {l: i for i, l in enumerate(LABELS)}
 OUT = "/kaggle/working/spanguard-span-mdistil"
-DATA = "/kaggle/input/spanguard-corpus"
+DATA = "/kaggle/input/spanguard-corpus-v2"
 
 t_start = time.time()
 

@@ -23,7 +23,7 @@ push_kernel () {  # $1 slug-suffix, $2 script file, $3 gpu(true/false)
   "is_private": "true",
   "enable_gpu": "$3",
   "enable_internet": "true",
-  "dataset_data_sources": ["kragglenote2forwork/spanguard-corpus"],
+  "dataset_data_sources": ["kragglenote2forwork/spanguard-corpus-v2"],
   "competition_data_sources": [],
   "kernel_data_sources": [],
   "model_data_sources": []

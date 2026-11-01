@@ -20,7 +20,7 @@ import time
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-DATA = "/kaggle/input/spanguard-corpus"
+DATA = "/kaggle/input/spanguard-corpus-v2"
 OUT = "/kaggle/working/baselines.json"
 torch.set_num_threads(4)
 
