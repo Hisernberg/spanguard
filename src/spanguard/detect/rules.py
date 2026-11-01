@@ -41,11 +41,18 @@ _p("override-replace", "override", 0.9,
    r"\b(?:from\s+now\s+on|henceforth|instead)\b[^.\n]{0,60}\b(?:you\s+(?:are|must|will|should|have\s+to)|your\s+(?:task|goal|job|instructions?))\b")
 _p("override-newtask", "override", 0.85,
    r"\b(?:real|actual|new|updated|revised|true)\s+(?:task|instructions?|objective|goal|mission)\s*:")
+_p("override-de", "override", 0.9,
+   r"\b(?:ignoriere|übergehe|uebergehe|missachte|vergesse)\s+(?:alle\s+|die\s+|deine\s+|sämtliche\s+|saemtliche\s+|alle\s+bisherigen\s+)?"
+   r"(?:bisherigen\s+|vorherigen\s+|alten\s+|allen\s+)?"
+   r"(?:anweisungen|instruktionen|prüfungen|pruefungen|sicherheitsregeln|regeln|kontrollen|vorgaben)\b")
+_p("override-hu", "override", 0.9,
+   r"\bhagy(?:d|j)\s+figyelmen\s+k[íi]v[üu]l\b[^.\n]{0,40}\butasít" )
 
 # --- system / role impersonation ---------------------------------------------
 _p("tag-system", "impersonation", 0.95, r"<\|?(?:im_start|im_end|system|endoftext|eot|assistant)\|?>")
 _p("tag-metatag", "impersonation", 0.9, r"</?(?:system|assistant|instruction|instructions|tool_call|tool_result|function_call|function_response|request|context|memor(?:y|ies))\s*>")
-_p("line-system", "impersonation", 0.8, r"^\s{0,8}(?:SYSTEM(?:\s+UPDATE|PROMPT)?|INSTRUCTIONS?|POLICY)\s*:")
+_p("line-system", "impersonation", 0.8, r"(?:^|(?<=[.;!]\s))\s{0,8}(?:SYSTEM(?:\s+(?:UPDATE|PROMPT|NOTE|MESSAGE))?)\s*:")
+_p("bracket-system", "impersonation", 0.85, r"\[\s*system(?:\s+(?:note|update|message|announcement|instruction))?\s*\]")
 _p("forget-context", "override", 0.9,
    r"\b(?:forget|wipe|erase|discard|drop|clear)\s+(?:the\s+|your\s+|all\s+|everything\s+|that\s+)?(?:conversation|context|chat|history|messages?|above|prior\s+context)\b")
 _p("you-are-now", "impersonation", 0.9, r"\byou\s+are\s+now\s+(?:a|an|the)\b|\bact\s+as\s+(?:a|an|the)?\s*(?:different|new|unrestricted)\b")
@@ -54,7 +61,8 @@ _p("dev-mode", "impersonation", 0.9, r"\b(?:developer\s+mode|dan\s+mode|do\s+any
 
 # --- exfiltration / secret hunting --------------------------------------------
 _p("exfil-send", "exfil", 0.9,
-   r"\b(?:send|post|submit|upload|forward|exfiltrate|transmit)\b[^.\n]{0,120}?(?:https?://|ftp://|\b(?:curl|wget)\b|requests\.(?:post|get)|fetch\()")
+   r"\b(?:send|post|submit|upload|forward|exfiltrate|transmit|küldd\s+el|sende)\b[^.\n]{0,120}?"
+   r"(?:https?://|ftp://|t\.me/|telegram\.me/|discord\.gg/|wa\.me/|\b(?:curl|wget)\b|requests\.(?:post|get)|fetch\()")
 _p("exfil-include", "exfil", 0.85,
    r"\b(?:include|append|add|embed|reveal|print|show|repeat|copy|quote)\b[^.\n]{0,80}?"
    r"\b(?:api[\s_-]?key|api[\s_-]?secret|password|passphrase|access[\s_-]?token|auth[\s_-]?token|private[\s_-]?key|credentials?|env(?:ironment)?[\s_-]?variables?|\.env)\b")

@@ -1,6 +1,9 @@
 """Gateway tests: request inspection, tool-result cleaning, health."""
 
 import json
+import os
+
+os.environ.setdefault("SPANGUARD_MODE", "rules")  # gateway tests must not download the model
 
 from fastapi.testclient import TestClient
 
