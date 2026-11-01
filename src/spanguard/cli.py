@@ -21,7 +21,10 @@ def main(argv: list[str] | None = None) -> int:
     up.add_argument("--port", type=int, default=None)
 
     ev = sub.add_parser("eval", help="run the eval harness over fixture sets")
-    ev.add_argument("--detectors", default="rules")
+    ev.add_argument("--detectors", default="spanguard-rules")
+    ev.add_argument("--sets", default="handwritten,agent-traffic,public-deepset")
+    ev.add_argument("--limit", type=int, default=None)
+    ev.add_argument("--tag", default=None)
     ev.add_argument("--out", default=None)
 
     rep = sub.add_parser("report", help="regenerate README benchmark blocks + charts")
@@ -54,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "eval":
         from .eval.cli import run_eval
 
-        run_eval(detectors=args.detectors, out=args.out)
+        run_eval(args.detectors.split(","), args.sets.split(","), tag=args.tag, limit=args.limit)
         return 0
 
     if args.cmd == "report":
