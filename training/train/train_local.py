@@ -102,7 +102,8 @@ def span_f1_local(model, docs, max_len=MAX_LEN):
     for d in docs:
         text = d["text"]
         enc = tok(text, return_offsets_mapping=True, truncation=True, max_length=max_len,
-                  stride=STRIDE, return_overflowing_tokens=True, return_tensors="pt")
+                  stride=STRIDE, return_overflowing_tokens=True, padding="max_length",
+                  return_tensors="pt")
         offsets = enc.pop("offset_mapping")[0].tolist()
         enc.pop("overflow_to_sample_mapping", None)
         with torch.no_grad():
