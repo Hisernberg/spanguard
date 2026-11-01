@@ -24,7 +24,8 @@ import torch
 from torch.utils.data import Dataset
 from transformers import (AutoModelForSequenceClassification,
                           AutoModelForTokenClassification, AutoTokenizer,
-                          DataCollatorForTokenClassification, Trainer,
+                          DataCollatorForTokenClassification,
+                          DataCollatorWithPadding, Adafactor, Trainer,
                           TrainingArguments)
 
 REPO = Path(__file__).resolve().parents[2]
@@ -154,10 +155,11 @@ def train_span():
     model = AutoModelForTokenClassification.from_pretrained(
         BASE, num_labels=3, id2label={i: l for i, l in enumerate(LABELS)}, label2id=LABEL2ID)
     args = TrainingArguments(
-        output_dir="/tmp/ckpt-span", per_device_train_batch_size=8,
-        per_device_eval_batch_size=16, learning_rate=5e-5, num_train_epochs=2,
-        eval_strategy="epoch", save_strategy="no", logging_steps=100,
-        report_to=[], seed=SEED, dataloader_num_workers=0,
+        output_dir="/tmp/ckpt-span", per_device_train_batch_size=4,
+        gradient_accumulation_steps=2, per_device_eval_batch_size=8,
+        num_train_epochs=2, eval_strategy="epoch", save_strategy="no",
+        logging_steps=100, report_to=[], seed=SEED, dataloader_num_workers=0,
+        optim="adafactor",
     )
     collator = DataCollatorForTokenClassification(tok, padding=True, label_pad_token_id=-100)
     trainer = Trainer(model=model, args=args, train_dataset=RowDataset(train_rows),
@@ -230,11 +232,12 @@ def eval_binary_local(model, rows, tokenizer, max_len):
 def train_classifier(name, train_rows, eval_rows, max_len, epochs=2, bs=8):
     log(f"{name}: train {len(train_rows)} eval {len(eval_rows)}")
     model = AutoModelForSequenceClassification.from_pretrained(BASE, num_labels=2)
-    args = TrainingArguments(output_dir=f"/tmp/ckpt-{name}", per_device_train_batch_size=bs,
-                             per_device_eval_batch_size=16, learning_rate=5e-5,
-                             num_train_epochs=epochs, eval_strategy="epoch", save_strategy="no",
-                             logging_steps=100, report_to=[], seed=SEED,
-                             dataloader_num_workers=0)
+    args = TrainingArguments(output_dir=f"/tmp/ckpt-{name}", per_device_train_batch_size=4,
+                             gradient_accumulation_steps=2, per_device_eval_batch_size=8,
+                             learning_rate=5e-5, num_train_epochs=epochs,
+                             eval_strategy="epoch", save_strategy="no", logging_steps=100,
+                             report_to=[], seed=SEED, dataloader_num_workers=0,
+                             optim="adafactor")
     trainer = Trainer(model=model, args=args, train_dataset=ClfDataset(train_rows, tok, max_len),
                       eval_dataset=ClfDataset(eval_rows, tok, max_len),
                       data_collator=DataCollatorWithPadding(tok))
