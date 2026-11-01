@@ -27,7 +27,7 @@ from transformers import (AutoModelForSequenceClassification,
                           DataCollatorForTokenClassification, Trainer,
                           TrainingArguments)
 
-REPO = Path(__file__).resolve().parents[1]
+REPO = Path(__file__).resolve().parents[2]
 BASE = "distilbert-base-multilingual-cased"
 OUT_ROOT = REPO / "data" / "models"
 OUT_ROOT.mkdir(parents=True, exist_ok=True)
