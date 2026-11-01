@@ -327,6 +327,61 @@ def chart_transcript(dark=False) -> str:
     return _svg(W, H, body, dark)
 
 
+# ------------------------------------------------------------------ tool-call surface
+def _toolcall_systems() -> list[dict]:
+    return [s for s in collect_systems() if _set_metric(s, "tool-call-args", "recall") is not None]
+
+
+def chart_toolcall(dark=False) -> str:
+    """The agent->tool surface: block-recall vs false-block on held-out function calls."""
+    systems = _toolcall_systems()
+    if not systems:
+        return ""
+    W, ml, mr = 640, 168, 40
+    rowh, head = 64, 76
+    H = head + rowh * len(systems) + 34
+    pw = W - ml - mr
+    body = _txt(ml, 26, "Tool-call guard: attacks hidden in function arguments (held-out set)", 14, weight="600")
+    body += _txt(ml, 46, "block-recall ↑ good · false-block ↓ good — one call is all or nothing", 11, "{muted}")
+    for i, frac in enumerate((0, 0.25, 0.5, 0.75, 1.0)):
+        x = ml + pw * frac
+        body += _line(x, head - 8, x, H - 26)
+        body += _txt(x, H - 12, f"{frac:.0%}", 10, "{muted}", "middle")
+    for i, s in enumerate(systems):
+        m = s["sets"]["tool-call-args"]
+        y = head + rowh * i
+        body += _txt(8, y + 16, s["label"], 12, s["color_dark"] if not dark else s["color"], weight="600")
+        body += _txt(8, y + 32, f"{m.get('docs', 0)} calls", 10, "{muted}")
+        rec = m.get("recall", 0)
+        fb = m.get("false_block_rate", 0)
+        body += _rect(ml, y + 6, pw * min(1.0, rec), 12, s["color"], rx=4)
+        body += _txt(ml + pw * min(1.0, rec) + 6, y + 16, f"block-recall {rec:.1%}", 10.5, "{ink}")
+        body += _rect(ml, y + 26, pw * min(1.0, fb), 12, "#f85149" if fb > 0.1 else "#d29922", rx=4, opacity=0.85)
+        body += _txt(ml + pw * min(1.0, fb) + 6, y + 36, f"false-block {fb:.1%}", 10.5, "{muted}")
+    return _svg(W, H, body, dark)
+
+
+def toolcall_block() -> str:
+    """README markdown for the tool-call benchmark (empty when no record yet)."""
+    systems = _toolcall_systems()
+    if not systems:
+        return ""
+    rows = ["| Model | Calls | Block-recall | False-block | F1 | p50 latency |",
+            "|---|---|---|---|---|---|"]
+    for s in systems:
+        m = s["sets"]["tool-call-args"]
+        rows.append(f"| {s['label']} | {m.get('docs', 0)} | {m.get('recall', 0):.1%} | "
+                    f"{m.get('false_block_rate', 0):.1%} | {m.get('f1', 0):.1%} | {m.get('latency_ms_p50', '—')} ms |")
+    tbl = "\n".join(rows)
+    return ("\n### The agent→tool surface (function calls)\n\nAttacks also arrive as tool-call arguments — "
+            "\"send_email(body=... ignore your instructions ...)\". The tool-call guard classifies the whole "
+            "call before it executes; both family models are scored on the same held-out generated set "
+            "(fictional tools, deterministic seeds), so the specialization is measurable:\n\n"
+            + tbl + "\n\nBlock-recall is recall on malicious calls; false-block is the share of benign calls "
+            "a gateway would have to reject. This surface is all-or-nothing — a span edit inside a JSON "
+            "argument is not an option, which is exactly why a dedicated classifier earns its place in the family.\n")
+
+
 # ------------------------------------------------------------------ README blocks
 def readme_blocks() -> tuple[str, str]:
     systems = collect_systems()
@@ -378,6 +433,10 @@ def render_all() -> None:
         out[f"f1-{set_name}.svg"] = chart_f1(systems, set_name)
     out["latency.svg"] = chart_latency(systems)
     out["cost-ledger.svg"] = chart_cost(systems)
+    tc = chart_toolcall()
+    if tc:
+        out["toolcall.svg"] = tc
+        out["toolcall-dark.svg"] = chart_toolcall(dark=True)
     out["banner.svg"] = chart_banner()
     out["banner-dark.svg"] = chart_banner(dark=True)
     out["pipeline.svg"] = chart_pipeline()
@@ -388,6 +447,19 @@ def render_all() -> None:
         (CHARTS / name).write_text(svg, encoding="utf-8")
     print(f"rendered {len(out)} charts into {CHARTS}")
     intro, table = readme_blocks()
+    tc_block = toolcall_block()
+    readme = REPO / "README.md"
+    if readme.exists() and tc_block:
+        src = readme.read_text(encoding="utf-8")
+        marker_open, marker_close = "<!-- toolcall:start -->", "<!-- toolcall:end -->"
+        if marker_open in src:
+            import re as _re
+            src = _re.sub(marker_open + r".*?" + marker_close,
+                          marker_open + "\n" + tc_block + marker_close, src, flags=_re.S)
+            readme.write_text(src, encoding="utf-8")
+            print("README toolcall block updated")
+        else:
+            print("note: add <!-- toolcall:start -->…<!-- toolcall:end --> markers to README")
     print("README intro block:\n" + intro[:600])
     print("README table block:\n" + table[:600])
 
