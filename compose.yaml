@@ -1,0 +1,17 @@
+services:
+  gateway:
+    build: .
+    image: spanguard:latest
+    ports: ["8819:8819"]
+    environment:
+      SPANGUARD_MODE: ${SPANGUARD_MODE:-fast}
+      SPANGUARD_UPSTREAM_URL: ${SPANGUARD_UPSTREAM_URL:-https://inference.baseten.co/v1}
+      SPANGUARD_UPSTREAM_MODEL: ${SPANGUARD_UPSTREAM_MODEL:-meta-models/muse-spark-open-1026}
+      BASETEN_API_KEY: ${BASETEN_API_KEY:-}
+      SPANGUARD_API_TOKEN: ${SPANGUARD_API_TOKEN:-}
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+  # The guarded agent (example): any OpenAI-compatible client that points its
+  # base_url at http://gateway:8819/v1 instead of the provider.
+volumes:
+  hf-cache:

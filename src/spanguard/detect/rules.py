@@ -45,7 +45,9 @@ _p("override-newtask", "override", 0.85,
 # --- system / role impersonation ---------------------------------------------
 _p("tag-system", "impersonation", 0.95, r"<\|?(?:im_start|im_end|system|endoftext|eot|assistant)\|?>")
 _p("tag-metatag", "impersonation", 0.9, r"</?(?:system|assistant|instruction|instructions|tool_call|tool_result|function_call|function_response|request|context|memor(?:y|ies))\s*>")
-_p("line-system", "impersonation", 0.8, r"^\s{0,8}(?:SYSTEM|SYSTEM PROMPT|INSTRUCTIONS?)\s*:")
+_p("line-system", "impersonation", 0.8, r"^\s{0,8}(?:SYSTEM(?:\s+UPDATE|PROMPT)?|INSTRUCTIONS?|POLICY)\s*:")
+_p("forget-context", "override", 0.9,
+   r"\b(?:forget|wipe|erase|discard|drop|clear)\s+(?:the\s+|your\s+|all\s+|everything\s+|that\s+)?(?:conversation|context|chat|history|messages?|above|prior\s+context)\b")
 _p("you-are-now", "impersonation", 0.9, r"\byou\s+are\s+now\s+(?:a|an|the)\b|\bact\s+as\s+(?:a|an|the)?\s*(?:different|new|unrestricted)\b")
 _p("role-adopt", "impersonation", 0.75, r"^\s*assistant\s*:\s", re.IGNORECASE)
 _p("dev-mode", "impersonation", 0.9, r"\b(?:developer\s+mode|dan\s+mode|do\s+anything\s+now|godmode|unrestricted\s+mode)\b")

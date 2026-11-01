@@ -1,0 +1,5 @@
+{
+  "systems": ["spanguard-rules"],
+  "sets": ["handwritten", "agent-traffic", "public-deepset"],
+  "about": "CI regression gate (make gate): runs the listed systems now and compares each fixture set with the newest committed run record of the same system. Escape/over-strip must not rise and F1 must not fall beyond the absolute tolerances in src/spanguard/eval/gate.py. Lower a tolerance when quality improves; never raise one to make a PR pass without saying why in the PR."
+}
