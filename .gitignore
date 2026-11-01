@@ -11,3 +11,4 @@ data/corpus/test.jsonl
 .env
 .venv/
 .ipynb_checkpoints/
+data/models/
