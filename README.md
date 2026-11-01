@@ -82,6 +82,20 @@ optional bearer token). Set `SPANGUARD_API_TOKEN` before exposing the gateway be
 The training notebook (`training/train/kaggle_train.py`) is committed and reproducible on a
 free Kaggle GPU. Fictional data only — no personal data, no scraped text.
 
+### The model family
+
+One corpus, three small guards — each shipped, published, and benchmarked:
+
+| model | task | arch | benchmark |
+|---|---|---|---|
+| [`spanguard-span-mdistil`](https://huggingface.co/Nabidnur/spanguard-span-mdistil) | find attack **spans** inside tool output (surgical strip) | 135M BIO tagger | escape vs over-strip frontier, family heatmap, span F1 |
+| `spanguard-docguard` | whole-document **attack classifier** (the one-bit baseline, trained on the same data for a fair fight) | 135M seq-cls | doc P/R/F1, false-block rate |
+| `spanguard-toolguard` | **tool-call / function-argument** guard: is this call itself malicious? | 135M seq-cls | block-recall vs false-block on held-out generated calls |
+
+`docguard` exists to prove the span formulation wins *with the same data*; `toolguard`
+covers the outbound direction (agent → tool), which span stripping does not address. All
+three are distilled from the same fictional corpus and run on CPU.
+
 ## Results
 
 <!-- results:start -->
