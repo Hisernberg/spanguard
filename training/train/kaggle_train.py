@@ -31,11 +31,31 @@ t_start = time.time()
 
 
 def load(split):
-    path = os.path.join(DATA, f"labelled/{split}.jsonl") if split in ("train", "dev") else os.path.join(DATA, f"corpus/{split}.jsonl")
-    if not os.path.exists(path):
-        path = os.path.join(DATA, f"{split}.jsonl")
+    """Locate a split by basename under the dataset mount, waiting out dataset
+    version reprocessing (the mount can lag for minutes after a version push)."""
+    deadline = time.time() + 420
+    while True:
+        wanted = []
+        if os.path.isdir(DATA):
+            for root, _dirs, files in os.walk(DATA):
+                for f in files:
+                    if f == f"{split}.jsonl":
+                        wanted.append(os.path.join(root, f))
+        if wanted:
+            break
+        if time.time() > deadline:
+            listing = os.listdir("/kaggle/input") if os.path.isdir("/kaggle/input") else []
+            raise FileNotFoundError(f"{split}.jsonl not found under {DATA}; /kaggle/input: {listing}")
+        print(f"[wait] dataset mount empty, retrying in 60s ({split})")
+        time.sleep(60)
+    for p in wanted:  # teacher-labelled version wins for train/dev
+        if "labelled" in p:
+            path = p
+            break
+    else:
+        path = sorted(wanted)[0]
     docs = [json.loads(l) for l in open(path, encoding="utf-8")]
-    print(split, len(docs))
+    print(split, len(docs), "<-", path)
     return docs
 
 

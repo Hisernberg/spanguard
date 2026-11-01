@@ -1,40 +1,27 @@
 #!/usr/bin/env bash
-# Push the Spanguard corpus dataset + training/baselines kernels to Kaggle, then
-# start the training kernel. Requires KAGGLE_CONFIG_DIR with kaggle.json.
+# Push the training/baselines/family kernels to Kaggle and start them.
+# Auth: KAGGLE_API_TOKEN env (Kaggle access token). The corpus dataset
+# (kragglenote2forwork/spanguard-corpus) is uploaded by scripts/kaggle_dataset.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."   # repo root
-export KAGGLE_CONFIG_DIR="${KAGGLE_CONFIG_DIR:-/home/z/my-project/.secrets/kaggle}"
+if [ -z "${KAGGLE_API_TOKEN:-}" ]; then
+  KAGGLE_API_TOKEN=$(sed -n 's/^export KAGGLE_TOKEN="\(.*\)"/\1/p' /home/z/my-project/.secrets/env)
+  export KAGGLE_API_TOKEN
+fi
 
-STAGE=/tmp/kaggle-dataset
-rm -rf "$STAGE" && mkdir -p "$STAGE/corpus" "$STAGE/labelled" "$STAGE/fixtures"
-cp data/corpus/train.jsonl data/corpus/dev.jsonl data/corpus/test.jsonl "$STAGE/corpus/"
-cp data/corpus/labelled/train.jsonl data/corpus/labelled/dev.jsonl "$STAGE/labelled/"
-cp eval/fixtures/handwritten-en.jsonl eval/fixtures/handwritten-de.jsonl eval/fixtures/handwritten-hu.jsonl \
-   eval/fixtures/public-deepset.jsonl "$STAGE/fixtures/"
-cp data/corpus/labelled/manifest.json "$STAGE/labelled/" 2>/dev/null || true
-
-cat > "$STAGE/dataset-metadata.json" <<'EOF'
+push_kernel () {  # $1 slug-suffix, $2 script file, $3 gpu(true/false)
+  local DIR="/tmp/kaggle-kernel-$1"
+  rm -rf "$DIR" && mkdir -p "$DIR"
+  cp "$2" "$DIR/$1.py"
+  cat > "$DIR/kernel-metadata.json" <<EOF
 {
-  "title": "Spanguard Corpus",
-  "id": "kragglenote2forwork/spanguard-corpus",
-  "licenses": [{ "name": "CC0-1.0" }]
-}
-EOF
-
-kaggle datasets create -p "$STAGE" --dir-mode zip || kaggle datasets version -p "$STAGE" --dir-mode zip -m "corpus update"
-echo "dataset pushed"
-
-TRAIN_DIR=/tmp/kaggle-kernel-train
-BASE_DIR=/tmp/kaggle-kernel-base
-mkdir -p "$TRAIN_DIR" "$BASE_DIR"
-cp training/train/kaggle_train.py "$TRAIN_DIR/train.py"
-cat > "$TRAIN_DIR/kernel-metadata.json" <<'EOF'
-{
-  "id": "kragglenote2forwork/spanguard-train",
+  "id": "kragglenote2forwork/spanguard-$1",
+  "title": "spanguard-$1",
+  "code_file": "$1.py",
   "language": "python",
   "kernel_type": "script",
   "is_private": "true",
-  "enable_gpu": "true",
+  "enable_gpu": "$3",
   "enable_internet": "true",
   "dataset_data_sources": ["kragglenote2forwork/spanguard-corpus"],
   "competition_data_sources": [],
@@ -42,12 +29,10 @@ cat > "$TRAIN_DIR/kernel-metadata.json" <<'EOF'
   "model_data_sources": []
 }
 EOF
-kaggle kernels push -p "$TRAIN_DIR"
-echo "train kernel pushed"
+  kaggle kernels push -p "$DIR" && echo "$1 kernel pushed"
+}
 
-cp training/train/kaggle_baselines.py "$BASE_DIR/baselines.py"
-cp "$TRAIN_DIR/kernel-metadata.json" "$BASE_DIR/kernel-metadata.json"
-sed -i 's/spanguard-train/spanguard-baselines/' "$BASE_DIR/kernel-metadata.json"
-kaggle kernels push -p "$BASE_DIR"
-echo "baselines kernel pushed"
+push_kernel train training/train/kaggle_train.py true
+push_kernel baselines training/train/kaggle_baselines.py false
+push_kernel family training/train/kaggle_train_family.py true
 kaggle kernels status kragglenote2forwork/spanguard-train || true
