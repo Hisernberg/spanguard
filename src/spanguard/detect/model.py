@@ -44,6 +44,7 @@ class SpanModel:
             max_length=MAX_TOKENS,
             stride=STRIDE,
             return_overflowing_tokens=True,
+            padding="max_length",  # overflow windows are uneven; the last one would break tensor stacking
             return_tensors="pt",
         )
         offsets = enc.pop("offset_mapping")

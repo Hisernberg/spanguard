@@ -17,7 +17,7 @@ import torch
 
 REPO = Path(__file__).resolve().parents[1]
 MODELS = REPO / "data" / "models"
-TEST = MODELS / "spanguard-toolguard" / "toolcall_test_set.json"
+TEST = MODELS / "spanguard-toolguard-mdistil" / "toolcall_test_set.json"
 torch.set_num_threads(2)
 
 
