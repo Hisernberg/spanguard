@@ -1,0 +1,113 @@
+{
+  "intro_what": "An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; a 135M-parameter multilingual span model plus validated rules find prompt-injection text inside the data and replace each span with [stripped], while orders, totals, names and JSON structure survive untouched.",
+  "intro_alternative": "Llama Prompt Guard 2 90M (Meta) reaches 0.0% escape only by discarding 100% of flagged documents — the agent loses the data it was reading; see the frontier chart.",
+  "intro_measured": "Committed run records per system and set (eval/results/), fictional data only, an external public set for generalization, per-attack-family heatmaps, CPU latency measured where each system ran, and a cost ledger. Rerun everything with `make eval` + the Kaggle kernels in training/train/.",
+  "latency_note": "measured where each system ran (p50 per document): local systems on Kaggle CPU, 4 threads; the LLM column includes network round-trip",
+  "cost_note": "LLM-based guarding pays per token; local guards pay $0 per document — computed from recorded token usage at Baseten list prices",
+  "set_order": {
+    "handwritten": "Hand-written attacks · 62 docs (en+de+hu)",
+    "agent-traffic": "Agent traffic · 900 docs (synthetic tool output)",
+    "public-deepset": "Public prompts · 452 docs (deepset, external)"
+  },
+  "axes": {
+    "handwritten": {
+      "frontier_title": "Escape rate against over-stripping — hand-written set (62 docs)",
+      "heatmap_title": "Escape rate by attack family — hand-written set",
+      "language_title": "Escape rate by language — hand-written set",
+      "f1_title": "Doc-level detection F1 — hand-written set",
+      "overstrip_max": 1.0,
+      "escape_max": 1.0
+    },
+    "agent-traffic": {
+      "frontier_title": "Escape rate against over-stripping — agent traffic (900 docs)",
+      "heatmap_title": "Escape rate by attack family — agent traffic",
+      "language_title": "Escape rate by language — agent traffic",
+      "f1_title": "Doc-level detection F1 — agent traffic",
+      "overstrip_max": 1.0,
+      "escape_max": 1.0
+    },
+    "public-deepset": {
+      "frontier_title": "Escape rate against over-stripping — public prompt set (452 docs)",
+      "heatmap_title": "Escape rate by attack family — public prompt set",
+      "language_title": "Escape rate by language — public prompt set",
+      "f1_title": "Doc-level detection F1 — public prompt set",
+      "overstrip_max": 1.0,
+      "escape_max": 1.0
+    }
+  },
+  "families": [
+    { "id": "override", "label": "override / instruction replacement" },
+    { "id": "impersonation", "label": "system or role impersonation" },
+    { "id": "forgery", "label": "forged tool results / trusted blocks" },
+    { "id": "exfil-secret", "label": "secret hunting (.env, keys)" },
+    { "id": "exfil-url", "label": "exfiltration to URL / email" },
+    { "id": "encoding-b64", "label": "base64-encoded instruction" },
+    { "id": "encoding-hex", "label": "hex-encoded instruction" },
+    { "id": "smuggle-unicode", "label": "invisible-unicode smuggling" },
+    { "id": "smuggle-homoglyph", "label": "homoglyph / mixed script" },
+    { "id": "narrative", "label": "note-to-the-assistant narrative" }
+  ],
+  "systems": [
+    {
+      "tag": "spanguard-fast",
+      "label": "spanguard fast (rules + SLM)",
+      "short": "SG fast",
+      "color": "#1a7f37",
+      "color_dark": "#1a7f37",
+      "hero": true,
+      "latency_note": "Kaggle CPU, 4 threads, p50 per document, model-only path",
+      "cost_usd_per_1m_docs": 0
+    },
+    {
+      "tag": "spanguard-rules",
+      "label": "spanguard rules-only",
+      "short": "SG rules",
+      "color": "#1f6feb",
+      "color_dark": "#1f6feb",
+      "cost_usd_per_1m_docs": 0,
+      "required": false
+    },
+    {
+      "tag": "prompt-guard-2-22m",
+      "label": "Llama Prompt Guard 2 22M (Meta)",
+      "short": "PG2-22M",
+      "color": "#9a6700",
+      "color_dark": "#d29922",
+      "latency_p50_ms": null,
+      "cost_usd_per_1m_docs": 0
+    },
+    {
+      "tag": "prompt-guard-2-90m",
+      "label": "Llama Prompt Guard 2 90M (Meta)",
+      "short": "PG2-90M",
+      "color": "#bf8700",
+      "color_dark": "#e3b341",
+      "cost_usd_per_1m_docs": 0
+    },
+    {
+      "tag": "protectai-deberta-v2",
+      "label": "protectai deberta-v3-injection-v2",
+      "short": "protAI",
+      "color": "#8250df",
+      "color_dark": "#ab7df8",
+      "cost_usd_per_1m_docs": 0
+    },
+    {
+      "tag": "llm-self-detect",
+      "label": "Muse Spark Open self-detect",
+      "short": "LLM",
+      "color": "#cf222e",
+      "color_dark": "#f85149",
+      "cost_usd_per_1m_docs": 2900
+    },
+    {
+      "tag": "spanguard-audit",
+      "label": "spanguard audit (rules+SLM+LLM)",
+      "short": "SG audit",
+      "color": "#0550ae",
+      "color_dark": "#4493f8",
+      "required": false,
+      "cost_usd_per_1m_docs": null
+    }
+  ]
+}
