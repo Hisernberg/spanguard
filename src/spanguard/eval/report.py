@@ -449,17 +449,22 @@ def render_all() -> None:
     intro, table = readme_blocks()
     tc_block = toolcall_block()
     readme = REPO / "README.md"
-    if readme.exists() and tc_block:
+    if readme.exists():
         src = readme.read_text(encoding="utf-8")
-        marker_open, marker_close = "<!-- toolcall:start -->", "<!-- toolcall:end -->"
-        if marker_open in src:
-            import re as _re
-            src = _re.sub(marker_open + r".*?" + marker_close,
-                          marker_open + "\n" + tc_block + marker_close, src, flags=_re.S)
+        changed = False
+        for open_m, close_m, content in (
+            ("<!-- intro:start -->", "<!-- intro:end -->", intro),
+            ("<!-- results:start -->", "<!-- results:end -->", table),
+            ("<!-- toolcall:start -->", "<!-- toolcall:end -->", tc_block),
+        ):
+            if open_m in src and content:
+                import re as _re
+                src = _re.sub(_re.escape(open_m) + r".*?" + _re.escape(close_m),
+                              open_m + "\n" + content + "\n" + close_m, src, flags=_re.S)
+                changed = True
+        if changed:
             readme.write_text(src, encoding="utf-8")
-            print("README toolcall block updated")
-        else:
-            print("note: add <!-- toolcall:start -->…<!-- toolcall:end --> markers to README")
+            print("README blocks updated (intro/results/toolcall)")
     print("README intro block:\n" + intro[:600])
     print("README table block:\n" + table[:600])
 

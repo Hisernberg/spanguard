@@ -1,0 +1,167 @@
+{
+  "generated_at": "2026-11-01T19:36:39+00:00",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-5.10.134-013.15.kangaroo.al8.x86_64-x86_64-with-glibc2.41"
+  },
+  "systems": {
+    "spanguard-rules": {
+      "sets": {
+        "handwritten": {
+          "docs": 62,
+          "planted": 48,
+          "escape_rate": 0.7292,
+          "overstrip_rate": 0.0746,
+          "doc_precision": 0.8,
+          "doc_recall": 0.3333,
+          "doc_f1": 0.4706,
+          "span_precision": 0.08,
+          "span_recall": 0.0417,
+          "span_f1": 0.0548,
+          "latency_ms_p50": 0.2,
+          "latency_ms_p95": 0.2,
+          "per_language": {
+            "de": {
+              "escape_rate": 0.6923,
+              "docs": 17
+            },
+            "en": {
+              "escape_rate": 0.75,
+              "docs": 31
+            },
+            "hu": {
+              "escape_rate": 0.7273,
+              "docs": 14
+            }
+          },
+          "per_family": {
+            "encoding": {
+              "escape_rate": 0.0,
+              "planted": 2
+            },
+            "exfil-secret": {
+              "escape_rate": 1.0,
+              "planted": 7
+            },
+            "exfil-url": {
+              "escape_rate": 0.4286,
+              "planted": 7
+            },
+            "forgery": {
+              "escape_rate": 0.8,
+              "planted": 10
+            },
+            "impersonation": {
+              "escape_rate": 0.5,
+              "planted": 6
+            },
+            "narrative": {
+              "escape_rate": 1.0,
+              "planted": 7
+            },
+            "override": {
+              "escape_rate": 0.8,
+              "planted": 5
+            },
+            "smuggle": {
+              "escape_rate": 0.75,
+              "planted": 4
+            }
+          }
+        },
+        "agent-traffic": {
+          "docs": 900,
+          "planted": 479,
+          "escape_rate": 0.1336,
+          "overstrip_rate": 0.0329,
+          "doc_precision": 0.8849,
+          "doc_recall": 0.8664,
+          "doc_f1": 0.8755,
+          "span_precision": 0.3636,
+          "span_recall": 0.4259,
+          "span_f1": 0.3923,
+          "latency_ms_p50": 0.2,
+          "latency_ms_p95": 0.5,
+          "per_language": {
+            "de": {
+              "escape_rate": 0.202,
+              "docs": 187
+            },
+            "en": {
+              "escape_rate": 0.0355,
+              "docs": 546
+            },
+            "hu": {
+              "escape_rate": 0.3469,
+              "docs": 167
+            }
+          },
+          "per_family": {
+            "encoding-b64": {
+              "escape_rate": 0.0,
+              "planted": 43
+            },
+            "encoding-hex": {
+              "escape_rate": 0.0,
+              "planted": 43
+            },
+            "exfil-secret": {
+              "escape_rate": 0.3261,
+              "planted": 46
+            },
+            "exfil-url": {
+              "escape_rate": 0.0,
+              "planted": 46
+            },
+            "forgery": {
+              "escape_rate": 0.0,
+              "planted": 47
+            },
+            "impersonation": {
+              "escape_rate": 0.26,
+              "planted": 50
+            },
+            "narrative": {
+              "escape_rate": 0.4091,
+              "planted": 44
+            },
+            "override": {
+              "escape_rate": 0.36,
+              "planted": 50
+            },
+            "smuggle-homoglyph": {
+              "escape_rate": 0.0,
+              "planted": 47
+            },
+            "smuggle-unicode": {
+              "escape_rate": 0.0,
+              "planted": 63
+            }
+          }
+        },
+        "public-deepset": {
+          "docs": 452,
+          "planted": 0,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.0008,
+          "doc_precision": 0.8947,
+          "doc_recall": 0.0837,
+          "doc_f1": 0.1532,
+          "span_precision": 0.0,
+          "span_recall": 0.0,
+          "span_f1": 0.0,
+          "latency_ms_p50": 0.1,
+          "latency_ms_p95": 0.4,
+          "per_language": {
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 452
+            }
+          },
+          "per_family": {}
+        }
+      },
+      "wallclock_s": 0
+    }
+  }
+}
