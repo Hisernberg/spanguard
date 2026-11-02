@@ -139,8 +139,8 @@ def main() -> None:
         "model": MODEL_ID, "mode": "local CPU (recovery build; earlier run used Muse Spark Open on Baseten)",
         "price_usd_per_1m": PRICE, "usage": {"input_tokens": tin, "output_tokens": tout, "docs": len(docs)},
         "cost_usd_priced_if_served": round(cost, 4),
-        "latency_ms_p50": round(statistics.median(lat), 1),
-        "latency_ms_p95": round(sorted(lat)[int(0.95 * len(lat))], 1),
+        "latency_ms_p50": round(statistics.median(lat), 1) if lat else None,
+        "latency_ms_p95": round(sorted(lat)[int(0.95 * len(lat))], 1) if lat else None,
         "verdicts": verdicts,
     }, indent=1), encoding="utf-8")
     print("wrote", out, "| priced-if-served $", round(cost, 4))
