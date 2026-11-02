@@ -14,9 +14,10 @@ _edge_ctx = {}
 
 
 def _load(dir_path: str | None):
-    key = dir_path or DEFAULT_DIR
+    import os
+    key = dir_path or os.environ.get("SPANGUARD_CHAR_MODEL") or DEFAULT_DIR
     if key not in _edge_ctx:
-        base = Path(__file__).parent.parent.parent / key
+        base = Path(key) if os.path.isabs(key) or key.startswith("data") else Path(__file__).parents[3] / key
         _edge_ctx[key] = load_model(str(base))
     return _edge_ctx[key]
 

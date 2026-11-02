@@ -10,8 +10,9 @@ from ..types import Result
 from . import rules as rules_mod
 from .strip import strip_spans
 
-_PROSE_HIGH_CONF = 0.75   # span-model confidence floor on unstructured text
+_PROSE_HIGH_CONF = 0.85   # span-model confidence that stands alone on unstructured text
 _PROSE_CHAR_BUMP = 0.1    # char-model threshold bump on unstructured text
+_PROSE_SLACK = 25         # char/span corroboration tolerance (chars)
 _STRUCTURED = re.compile(r"\{|\}|^\s*\w+=\S+|\s\|\s", re.M)
 
 
@@ -53,24 +54,46 @@ class Guard:
     def guard(self, text: str) -> Result:
         t0 = time.monotonic()
         spans = rules_mod.detect_rules(text)
+        model_spans_kept: list = []
         if self.mode in {"fast", "fast-v2", "audit"}:
             try:
                 model_spans = self.model.spans(text, threshold=self.threshold)
                 if self.mode == "fast-v2" and not is_structured(text):
                     model_spans = [s for s in model_spans if s.confidence >= _PROSE_HIGH_CONF]
-                spans += model_spans
+                if self.mode == "fast-v2":
+                    model_spans_kept = model_spans  # ensemble decides below
+                else:
+                    spans += model_spans
             except ImportError:
                 pass  # model extra not installed: rules still ran
         if self.mode == "fast-v2":
             try:
                 thr = self.char_threshold(text)
                 char_spans, _ = self.char_model(text, threshold=thr)
-                existing = [(x.start, x.end) for x in spans]
-                for a, b in char_spans:
-                    if not any(ra < b and a < rb for ra, rb in existing):
-                        spans.append(_mk_span(text, a, b))
+                prose = not is_structured(text)
+                if prose:
+                    # Corroboration channel: on prose (web pages, user prompts) both
+                    # neural detectors false-positive more, so a finding survives
+                    # only when the other detector backs it, a rule backs it, or it
+                    # is long (>=60 chars — never benign filler).
+                    for s in model_spans_kept:
+                        if any(sa < s.end + _PROSE_SLACK and s.start - _PROSE_SLACK < sb
+                               for sa, sb in char_spans):
+                            spans.append(s)
+                    for a, b in char_spans:
+                        backed = any(x.start < b + _PROSE_SLACK and a - _PROSE_SLACK < x.end
+                                     for x in spans)
+                        if (backed or b - a >= 60) and not any(
+                                x.start < b and a < x.end for x in spans):
+                            spans.append(_mk_span(text, a, b))
+                else:
+                    # Structured channel (home domain): union — recall dominates.
+                    spans += model_spans_kept
+                    for a, b in char_spans:
+                        if not any(x.start < b and a < x.end for x in spans):
+                            spans.append(_mk_span(text, a, b))
             except (ImportError, FileNotFoundError, OSError):
-                pass  # char extra not trained/installed: rules+model still ran
+                spans += model_spans_kept  # char unavailable: keep the span model
         result = strip_spans(text, spans)
         if self.mode == "audit":
             from .audit import AuditDetector, audit_spans  # noqa: PLC0415 - lazy
@@ -108,7 +131,7 @@ class Guard:
 def _mk_span(text: str, a: int, b: int):
     from ..types import Span  # noqa: PLC0415
 
-    return Span(start=a, end=b, confidence=0.6, model="spanguard-char")
+    return Span(start=a, end=b, kind="char-span", source="model:char", confidence=0.6)
 
 
 def _shift(first_result: Result, spans: list):

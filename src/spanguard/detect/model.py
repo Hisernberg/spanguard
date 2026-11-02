@@ -10,7 +10,7 @@ import os
 
 from ..types import Span
 
-DEFAULT_MODEL_ID = "Nabidnur/spanguard-span-xlmr-base"
+DEFAULT_MODEL_ID = "Nabidnur/spanguard-span-mdistil"
 LABELS = ["O", "B-INJ", "I-INJ"]
 MAX_TOKENS = 512
 STRIDE = 64
