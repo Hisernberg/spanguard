@@ -19,8 +19,10 @@ TOLERANCE = {"escape_rate": 0.02, "overstrip_rate": 0.03, "doc_f1": 0.02, "span_
 
 
 def newest_committed(system: str, exclude: Path | None = None) -> dict | None:
-    """Newest committed run record containing this system (dirs sort by date-stamp)."""
-    for run_dir in sorted(RESULTS.iterdir(), reverse=True):
+    """Newest committed run record containing this system (by generated_at, not dir name —
+    gate-* dirs sort after date-stamped ones lexicographically)."""
+    candidates = []
+    for run_dir in RESULTS.iterdir():
         if exclude is not None and run_dir.resolve() == exclude.resolve():
             continue
         f = run_dir / "run.json"
@@ -28,8 +30,10 @@ def newest_committed(system: str, exclude: Path | None = None) -> dict | None:
             continue
         data = json.loads(f.read_text())
         if system in data.get("systems", {}):
-            return data["systems"][system]
-    return None
+            candidates.append((data.get("generated_at", ""), data["systems"][system]))
+    if not candidates:
+        return None
+    return max(candidates, key=lambda c: c[0])[1]
 
 
 def compare(system: str, current: dict, previous: dict) -> list[str]:

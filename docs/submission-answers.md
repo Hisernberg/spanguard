@@ -27,7 +27,7 @@ injection is a span problem, not a document-classification problem.
 
 | Set (all fictional / public, never our own claims) | spanguard fast | rules-only | Qwen2.5-0.5B self-detect | protectai deberta-v3 | horizon small (binary) | horizon base (binary) |
 |---|---|---|---|---|---|---|
-| Hand-written attacks · 62 docs (en/de/hu) | **29.2% · 12.3%** | 72.9% · 7.5% | 91.7% · 13.1% | 35.4% · 71.8% | 8.3% · 37.7% | 6.2% · 59.0% |
+| Hand-written attacks · 62 docs (en/de/hu) | **29.2% · 11.3%** | 72.9% · 7.5% | 91.7% · 13.1% | 35.4% · 71.8% | 8.3% · 37.7% | 6.2% · 59.0% |
 | Agent traffic · 900 docs (synthetic tool output) | **0.0% · 3.3%** | 13.4% · 3.3% | 97.5% · 5.1% | 43.6% · 48.0% | 12.5% · 6.3% | 15.2% · 13.1% |
 | Public prompts · 452 docs (deepset, external) | 0.0% · 34.2% | 0.0% · 0.1% | 0.0% · 5.0% | 0.0% · 1.2% | 0.0% · 0.0% | 0.0% · 0.0% |
 

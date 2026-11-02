@@ -25,7 +25,7 @@ A span-level prompt-injection guard for AI agent tool traffic: strip the attack,
 
 | Set | spanguard fast | rules-only | protectai v3 | LLM 0.5B | horizon small | horizon base |
 |---|---|---|---|---|---|---|
-| Hand-written attacks (62, en/de/hu) | **29.2 · 12.3** | 72.9 · 7.5 | 35.4 · 71.8 | 91.7 · 13.1 | 8.3 · 37.7 | 6.2 · 59.0 |
+| Hand-written attacks (62, en/de/hu) | **29.2 · 11.3** | 72.9 · 7.5 | 35.4 · 71.8 | 91.7 · 13.1 | 8.3 · 37.7 | 6.2 · 59.0 |
 | Agent traffic (900, synthetic) | **0.0 · 3.3** | 13.4 · 3.3 | 43.6 · 48.0 | 97.5 · 5.1 | 12.5 · 6.3 | 15.2 · 13.1 |
 | Public prompts (452, deepset) | 0.0 · 34.2 | 0.0 · 0.1 | 0.0 · 1.2 | 0.0 · 5.0 | 0.0 · 0.0 | 0.0 · 0.0 |
 
