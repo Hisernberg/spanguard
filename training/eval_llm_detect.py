@@ -85,13 +85,25 @@ def main() -> None:
     torch.set_num_threads(2)
 
     verdicts = {}
+    out_p = REPO / args.out
+    if out_p.exists():
+        loaded = json.loads(out_p.read_text(encoding="utf-8"))
+        verdicts = loaded.get("verdicts", loaded)
+        print(f"resume: {len(verdicts)} verdicts loaded from {out_p}", flush=True)
+    todo = [d for d in docs if d["id"] not in verdicts]
     lat = []
     tin = tout = 0
     n_ok = 0
     t_start = time.monotonic()
 
-    for i in range(0, len(docs), args.batch):
-        batch = docs[i: i + args.batch]
+    def _checkpoint():
+        out_p.parent.mkdir(parents=True, exist_ok=True)
+        tmp = out_p.with_suffix(".tmp")
+        tmp.write_text(json.dumps({"verdicts": verdicts}), encoding="utf-8")
+        tmp.replace(out_p)
+
+    for i in range(0, len(todo), args.batch):
+        batch = todo[i: i + args.batch]
         prompts = [tok.apply_chat_template(
             [{"role": "system", "content": SYSTEM}, {"role": "user", "content": d["text"][:4000]}],
             tokenize=False, add_generation_prompt=True) for d in batch]
@@ -114,7 +126,8 @@ def main() -> None:
             verdicts[d["id"]] = spans
             lat.append(dt / len(batch))
             n_ok += bool(spans)
-        done = i + len(batch)
+        _checkpoint()
+        done = len(verdicts)
         if done % 80 < args.batch:
             rate = done / ((time.monotonic() - t_start) / 60)
             print(f"{done}/{len(docs)} docs | {rate:.1f} docs/min | with-spans {n_ok}", flush=True)
