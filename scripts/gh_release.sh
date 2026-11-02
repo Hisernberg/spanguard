@@ -23,13 +23,17 @@ A span-level prompt-injection guard for AI agent tool traffic: strip the attack,
 
 ### Headline numbers (escape % · over-strip %)
 
-| Set | spanguard fast | rules-only |
-|---|---|---|
-| Hand-written attacks (62, en/de/hu) | **29.2 · 12.3** | 75.0 · 7.5 |
-| Agent traffic (900, synthetic) | **0.0 · 3.3** | 13.4 · 3.3 |
-| Public prompts (452, deepset) | 0.0 · 34.2 | 0.0 · 0.1 |
+| Set | spanguard fast | rules-only | protectai v3 | LLM 0.5B | horizon small | horizon base |
+|---|---|---|---|---|---|---|
+| Hand-written attacks (62, en/de/hu) | **29.2 · 12.3** | 72.9 · 7.5 | 35.4 · 71.8 | 91.7 · 13.1 | 8.3 · 37.7 | 6.2 · 59.0 |
+| Agent traffic (900, synthetic) | **0.0 · 3.3** | 13.4 · 3.3 | 43.6 · 48.0 | 97.5 · 5.1 | 12.5 · 6.3 | 15.2 · 13.1 |
+| Public prompts (452, deepset) | 0.0 · 34.2 | 0.0 · 0.1 | 0.0 · 1.2 | 0.0 · 5.0 | 0.0 · 0.0 | 0.0 · 0.0 |
 
-Tool-call surface (400 held-out calls): toolguard blocks 100% of attacks with **0.0% false-blocks**; the doc-level model on the same calls false-blocks **39.0%**.
+Cells are escape % · over-strip %. spanguard fast is Pareto-optimal on the hand-written set;
+horizon-base buys 6.2% escape by destroying 59% of benign data; a 0.5B LLM self-check misses
+91.7% of hand-written attacks. Tool-call surface (400 held-out calls): toolguard blocks 100%
+of attacks with **0.0% false-blocks** at p50 45.5 ms; the doc-level model on the same calls
+false-blocks **39.0%**.
 
 ### Honesty
 

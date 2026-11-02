@@ -1,8 +1,8 @@
 # SpanGuard — Meta Global AI Hackathon 2026 submission answers
 
 > All numbers come from committed run records (`eval/results/*/run.json`); regeneration
-> commands in `docs/REPRODUCE.md`. "Pending" cells fill from the LLM/baseline chain when
-> it lands; nothing else in this file is a placeholder.
+> commands in `docs/REPRODUCE.md`. Every table cell below is from a re-runnable record —
+> nothing is projected, estimated or borrowed from another project's paper.
 
 ## 1. What does your project do? (≤ 100 words)
 
@@ -25,11 +25,22 @@ injection is a span problem, not a document-classification problem.
 
 ## 3. What does it measure? (the honest core)
 
-| Set (all fictional / public, never our own claims) | spanguard fast | rules-only | pending: LLM self-detect | pending: open baselines |
-|---|---|---|---|---|
-| Hand-written attacks · 62 docs (en/de/hu) | escape 29.2% · over-strip 12.3% | escape 75.0% · over-strip 7.5% | pending | pending |
-| Agent traffic · 900 docs (synthetic tool output) | escape 0.0% · over-strip 3.3% | escape 13.4% · over-strip 3.3% | pending | pending |
-| Public prompts · 452 docs (deepset, external) | escape 0.0% · over-strip 34.2% | escape 0.0% · over-strip 0.1% | pending | pending |
+| Set (all fictional / public, never our own claims) | spanguard fast | rules-only | Qwen2.5-0.5B self-detect | protectai deberta-v3 | horizon small (binary) | horizon base (binary) |
+|---|---|---|---|---|---|---|
+| Hand-written attacks · 62 docs (en/de/hu) | **29.2% · 12.3%** | 72.9% · 7.5% | 91.7% · 13.1% | 35.4% · 71.8% | 8.3% · 37.7% | 6.2% · 59.0% |
+| Agent traffic · 900 docs (synthetic tool output) | **0.0% · 3.3%** | 13.4% · 3.3% | 97.5% · 5.1% | 43.6% · 48.0% | 12.5% · 6.3% | 15.2% · 13.1% |
+| Public prompts · 452 docs (deepset, external) | 0.0% · 34.2% | 0.0% · 0.1% | 0.0% · 5.0% | 0.0% · 1.2% | 0.0% · 0.0% | 0.0% · 0.0% |
+
+Cells are **escape % · over-strip %**. Three readings the table gives away for free:
+
+1. **spanguard fast is Pareto-optimal on the hand-written set** — no competitor achieves
+   both lower escape and lower over-strip. horizon-base buys 6.2% escape by destroying
+   59.0% of benign characters; protectai is worse than spanguard on *both* axes.
+2. **A 0.5B LLM asked to flag injections in its own context misses 91.7%** of hand-written
+   attacks — "just ask the model to be careful" is not a defense (and it costs tokens).
+3. **The public-prompt set is spanguard's honest weak spot**: the span model (trained on
+   tool-output style) over-strips 34.2% of user-prompt text while catching every attack.
+   We publish it anyway; the rules-only column shows the fallback is safe there.
 
 - **Escape rate**: share of planted attack payload still fully readable after the guard.
 - **Over-stripping**: share of benign characters destroyed on clean documents.
@@ -46,9 +57,10 @@ injection is a span problem, not a document-classification problem.
 
 **Why a family and not one model:** on the same 400 held-out tool calls, the doc-level
 classifier reaches recall 1.0 but false-blocks **39.0%** of benign calls — unusable as a
-gateway policy — while the tool-call guard false-blocks **0.0%**. A span edit inside a
-JSON argument is not an option (the call executes or it doesn't), which is exactly why a
-dedicated classifier earns its place. Records: `eval/results/2026-11-01-family/run.json`.
+gateway policy — while the tool-call guard false-blocks **0.0%** (p50 45.5 ms vs 57.5 ms
+on CPU). A span edit inside a JSON argument is not an option (the call executes or it
+doesn't), which is exactly why a dedicated classifier earns its place.
+Records: `eval/results/2026-11-02-family/run.json`.
 
 ## 5. What did you build?
 
