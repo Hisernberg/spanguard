@@ -47,7 +47,6 @@ class Guard:
             if extra:
                 result = strip_spans(text, spans + _shift(result, extra))
         self.last_latency_ms = round((time.monotonic() - t0) * 1000, 1)
-        result.latency_ms = self.last_latency_ms
         return result
 
     def detectors(self) -> list[str]:

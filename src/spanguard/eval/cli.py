@@ -59,7 +59,7 @@ def external_system(record: dict, tag: str):
     flags = record.get("_flags", {})  # doc_id -> flagged
 
     def fn(doc: dict):
-        from ...types import Finding, Result
+        from ..types import Finding, Result
 
         if flags.get(doc["id"]):
             finding = Finding(start=0, end=len(doc["text"]), length=len(doc["text"]),
@@ -73,7 +73,7 @@ def external_system(record: dict, tag: str):
 def llm_selfdetect_system(limit: int | None = None, concurrency: int = 4):
     """LLM self-detection baseline. Reads the precomputed verdicts sidecar when
     present (training/eval_llm_detect.py); falls back to live calls otherwise."""
-    from ...types import Finding, Result  # noqa: PLC0415
+    from ..types import Finding, Result  # noqa: PLC0415
 
     sidecar = RESULTS / "llm-self-detect" / "verdicts.json"
     verdicts: dict = {}

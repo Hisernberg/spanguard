@@ -93,6 +93,7 @@ def run_system(model_id: str, tag: str, sets: dict) -> dict:
                 fn += not flagged
             elif flagged:
                 fp += 1
+                benign_chars += len(d["text"])
                 stripped_benign += len(d["text"])
             else:
                 benign_chars += len(d["text"])

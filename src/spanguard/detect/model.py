@@ -10,7 +10,7 @@ import os
 
 from ..types import Span
 
-DEFAULT_MODEL_ID = "Nabidnur/spanguard-span-mdistil"
+DEFAULT_MODEL_ID = "Nabidnur/spanguard-span-xlmr-base"
 LABELS = ["O", "B-INJ", "I-INJ"]
 MAX_TOKENS = 512
 STRIDE = 64
@@ -44,7 +44,6 @@ class SpanModel:
             max_length=MAX_TOKENS,
             stride=STRIDE,
             return_overflowing_tokens=True,
-            padding="max_length",  # overflow windows are uneven; the last one would break tensor stacking
             return_tensors="pt",
         )
         offsets = enc.pop("offset_mapping")

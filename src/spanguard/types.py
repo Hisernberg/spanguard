@@ -51,7 +51,6 @@ class Result:
     original: str
     cleaned: str
     stripped: list[Finding] = field(default_factory=list)
-    latency_ms: float | None = None
 
     @property
     def attacked(self) -> bool:
