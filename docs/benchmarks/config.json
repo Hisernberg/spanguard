@@ -98,23 +98,6 @@
       "required": false
     },
     {
-      "tag": "prompt-guard-2-22m",
-      "label": "Llama Prompt Guard 2 22M (Meta)",
-      "short": "PG2-22M",
-      "color": "#9a6700",
-      "color_dark": "#d29922",
-      "latency_p50_ms": null,
-      "cost_usd_per_1m_docs": 0
-    },
-    {
-      "tag": "prompt-guard-2-90m",
-      "label": "Llama Prompt Guard 2 90M (Meta)",
-      "short": "PG2-90M",
-      "color": "#bf8700",
-      "color_dark": "#e3b341",
-      "cost_usd_per_1m_docs": 0
-    },
-    {
       "tag": "protectai-deberta-v2",
       "label": "protectai deberta-v3-injection-v2",
       "short": "protAI",
@@ -157,6 +140,18 @@
       "color_dark": "#f0883e",
       "required": false,
       "cost_usd_per_1m_docs": 0
+    },
+    {
+      "tag": "horizon-small",
+      "name": "horizon injection-guard small (open baseline)",
+      "model": "Horizon-Labs/prompt-injection-guard-small",
+      "semantics": "binary"
+    },
+    {
+      "tag": "horizon-base",
+      "name": "horizon injection-guard base (open baseline)",
+      "model": "Horizon-Labs/prompt-injection-guard-base",
+      "semantics": "binary"
     }
   ]
 }
