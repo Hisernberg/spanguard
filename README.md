@@ -10,9 +10,9 @@
 
 <!-- intro:start -->
 - **What it does.** An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; a 135M-parameter multilingual span model plus validated rules find prompt-injection text inside the data and replace each span with [stripped], while orders, totals, names and JSON structure survive untouched.
-- **How well.** On the 62-document hand-written multilingual attack set, spanguard fast (rules + SLM) escapes 29.2% of planted attack payloads at 12.3% benign data loss (doc F1 80%); the strongest open alternative on the same set: the strongest open alternative on the same set (Llama Prompt Guard 2, strip-all semantics) is scored in the same table once its committed record lands — binary guards buy low escape with total document loss; see the frontier chart
+- **How well.** On the 62-document hand-written multilingual attack set, spanguard fast (rules + SLM) escapes 29.2% of planted attack payloads at 12.3% benign data loss (doc F1 80%). The strongest open binary guard on the same set (horizon injection-guard base, strip-all semantics) reaches 6.2% escape only by over-stripping 59.0% of benign characters — the agent loses most of what it was reading; protectai deberta-v3 is worse than spanguard on BOTH axes (35.4% escape, 71.8% over-strip); a 0.5B LLM asked to flag its own injections misses 91.7%
 - **On agent traffic.** 900 synthetic tool-output documents: escape 0.0%, over-strip 3.3%, doc F1 95%.
-- **How fast.** local CPU (4GB sandbox recovery build), 2 threads, p50 per document, model-only path
+- **How fast.** p50 ≈ tens of ms per document with the 135M span model on local CPU (2 threads, recovery build); rules-only ≈0.2 ms; no per-document API cost in any default mode
 - **Measured in the open.** Committed run records per system and set (eval/results/), fictional data only, an external public set for generalization, per-attack-family heatmaps, CPU latency measured where each system ran, and a cost ledger. Rerun everything with `make eval` + the Kaggle kernels in training/train/.
 <!-- intro:end -->
 
@@ -118,11 +118,11 @@ three are distilled from the same fictional corpus and run on CPU.
 ## Results
 
 <!-- results:start -->
-| Set | spanguard fast (rules + SLM) | spanguard rules-only | spanguard audit (rules+SLM+LLM) | spanguard docguard (doc classifier) | spanguard toolguard (tool-call args) |
-|---|---|---|---|---|---|
-| Hand-written attacks · 62 docs (en+de+hu) | 29.2% · 12.3% | 72.9% · 7.5% | — | — | — |
-| Agent traffic · 900 docs (synthetic tool output) | 0.0% · 3.3% | 13.4% · 3.3% | — | — | — |
-| Public prompts · 452 docs (deepset, external) | 0.0% · 34.2% | 0.0% · 0.1% | — | — | — |
+| Set | spanguard fast (rules + SLM) | spanguard rules-only | protectai deberta-v3-injection-v2 | Qwen2.5-0.5B self-detect (local CPU) | spanguard audit (rules+SLM+LLM) | spanguard docguard (doc classifier) | spanguard toolguard (tool-call args) | horizon injection-guard small (binary) | horizon injection-guard base (binary) |
+|---|---|---|---|---|---|---|---|---|---|
+| Hand-written attacks · 62 docs (en+de+hu) | 29.2% · 12.3% | 72.9% · 7.5% | 35.4% · 71.8% | 91.7% · 13.1% | — | — | — | 8.3% · 37.7% | 6.2% · 59.0% |
+| Agent traffic · 900 docs (synthetic tool output) | 0.0% · 3.3% | 13.4% · 3.3% | 43.6% · 48.0% | 97.5% · 5.1% | — | — | — | 12.5% · 6.3% | 15.2% · 13.1% |
+| Public prompts · 452 docs (deepset, external) | 0.0% · 34.2% | 0.0% · 0.1% | 0.0% · 1.2% | 0.0% · 5.0% | — | — | — | 0.0% · 0.0% | 0.0% · 0.0% |
 
 Escape · over-stripping, lower is better on both. Set sizes: handwritten 62 (en/de/hu, hand-written attacks), agent-traffic 900 (synthetic tool output), public-deepset 452 (external user-prompt set, binary).
 <!-- results:end -->
@@ -135,8 +135,8 @@ Attacks also arrive as tool-call arguments — "send_email(body=... ignore your 
 
 | Model | Calls | Block-recall | False-block | F1 | p50 latency |
 |---|---|---|---|---|---|
-| spanguard docguard (doc classifier) | 400 | 100.0% | 39.0% | 87.2% | 140.0 ms |
-| spanguard toolguard (tool-call args) | 400 | 100.0% | 0.0% | 100.0% | 149.3 ms |
+| spanguard docguard (doc classifier) | 400 | 100.0% | 39.0% | 87.2% | 57.5 ms |
+| spanguard toolguard (tool-call args) | 400 | 100.0% | 0.0% | 100.0% | 45.5 ms |
 
 Block-recall is recall on malicious calls; false-block is the share of benign calls a gateway would have to reject. This surface is all-or-nothing — a span edit inside a JSON argument is not an option, which is exactly why a dedicated classifier earns its place in the family.
 
@@ -232,11 +232,13 @@ If you use spanguard or the benchmark protocol, please cite the repo:
 
 ## Built for the Meta Global AI Hackathon 2026
 
-- **Meta open weights**: teacher, opt-in auditor and demo agent all run
-  `meta-models/muse-spark-open-1026` (Baseten); the guard itself is a fine-tuned open-weights
-  model — the full lineage and token cost are committed, not claimed.
-- **Demo**: 3-minute walkthrough video (linked above) + the live demo UI served by the gateway
-  at `/`.
+- **Meta open weights**: the opt-in audit mode runs Meta's Muse Spark Open
+  (`meta-models/muse-spark-open-1026`) as a second opinion on already-stripped text; the
+  guard itself is a fine-tuned open-weights model. The optional teacher pass ships as
+  tooling with cost tracking — it never ran against paid inference, and no token cost is
+  claimed anywhere in this repo.
+- **Demo**: 3-minute walkthrough video (script in [docs/demo-video-script.md](docs/demo-video-script.md))
+  + the live demo UI served by the gateway at `/` and the static Space linked above.
 - Solo project by Nabid Nur Abrar ([@Hisernberg](https://github.com/Hisernberg)) — Indie track.
 
 ## License

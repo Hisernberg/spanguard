@@ -393,8 +393,7 @@ def readme_blocks() -> tuple[str, str]:
     if hw:
         intro.append(f"- **How well.** On the {hw.get('docs', 0)}-document hand-written multilingual attack set, "
                      f"{hero['label']} escapes {hw.get('escape_rate', 0):.1%} of planted attack payloads at {hw.get('overstrip_rate', 0):.1%} "
-                     f"benign data loss (doc F1 {hw.get('doc_f1', 0):.0%}); the strongest open alternative on the same set: "
-                     + CONFIG["intro_alternative"])
+                     f"benign data loss (doc F1 {hw.get('doc_f1', 0):.0%}). " + CONFIG["intro_alternative"])
     if at:
         intro.append(f"- **On agent traffic.** {at.get('docs', 0)} synthetic tool-output documents: escape {at.get('escape_rate', 0):.1%}, "
                      f"over-strip {at.get('overstrip_rate', 0):.1%}, doc F1 {at.get('doc_f1', 0):.0%}.")

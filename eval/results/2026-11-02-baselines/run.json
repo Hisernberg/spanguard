@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-02T15:38:28+00:00",
+  "generated_at": "2026-11-02T17:00:16+00:00",
   "environment": {
     "platform": "local CPU sandbox (recovery build; Kaggle kernel is the GPU reference)",
     "device": "cpu",
@@ -12,12 +12,12 @@
           "docs": 62,
           "planted": 48,
           "escape_rate": 0.3542,
-          "overstrip_rate": 2.5436,
+          "overstrip_rate": 0.7178,
           "doc_precision": 0.7561,
           "doc_recall": 0.6458,
           "doc_f1": 0.6966,
-          "latency_ms_p50": 234.8,
-          "latency_ms_p95": 287.4,
+          "latency_ms_p50": 253.5,
+          "latency_ms_p95": 305.8,
           "per_family": {
             "encoding": {
               "escape_rate": 0.0,
@@ -71,12 +71,12 @@
           "docs": 900,
           "planted": 479,
           "escape_rate": 0.4363,
-          "overstrip_rate": 0.924,
+          "overstrip_rate": 0.4802,
           "doc_precision": 0.6905,
           "doc_recall": 0.5637,
           "doc_f1": 0.6207,
-          "latency_ms_p50": 226.5,
-          "latency_ms_p95": 458.9,
+          "latency_ms_p50": 241.6,
+          "latency_ms_p95": 494.2,
           "per_family": {
             "encoding-b64": {
               "escape_rate": 0.4651,
@@ -138,12 +138,12 @@
           "docs": 452,
           "planted": 0,
           "escape_rate": 0.0,
-          "overstrip_rate": 0.0117,
+          "overstrip_rate": 0.0116,
           "doc_precision": 0.956,
           "doc_recall": 0.4286,
           "doc_f1": 0.5918,
-          "latency_ms_p50": 163.9,
-          "latency_ms_p95": 240.2,
+          "latency_ms_p50": 159.4,
+          "latency_ms_p95": 223.0,
           "per_family": {},
           "per_language": {
             "en": {
@@ -153,7 +153,7 @@
           }
         }
       },
-      "latency_ms_p50": 206.2,
+      "latency_ms_p50": 215.4,
       "model": "protectai/deberta-v3-base-prompt-injection-v2"
     },
     "horizon-small": {
@@ -162,12 +162,12 @@
           "docs": 62,
           "planted": 48,
           "escape_rate": 0.0833,
-          "overstrip_rate": 0.6053,
+          "overstrip_rate": 0.377,
           "doc_precision": 0.898,
           "doc_recall": 0.9167,
           "doc_f1": 0.9072,
-          "latency_ms_p50": 77.6,
-          "latency_ms_p95": 94.8,
+          "latency_ms_p50": 87.5,
+          "latency_ms_p95": 101.2,
           "per_family": {
             "encoding": {
               "escape_rate": 0.0,
@@ -221,12 +221,12 @@
           "docs": 900,
           "planted": 479,
           "escape_rate": 0.1253,
-          "overstrip_rate": 0.0679,
+          "overstrip_rate": 0.0635,
           "doc_precision": 0.9437,
           "doc_recall": 0.8747,
           "doc_f1": 0.9079,
-          "latency_ms_p50": 89.6,
-          "latency_ms_p95": 215.8,
+          "latency_ms_p50": 90.3,
+          "latency_ms_p95": 214.0,
           "per_family": {
             "encoding-b64": {
               "escape_rate": 0.0,
@@ -292,8 +292,8 @@
           "doc_precision": 1.0,
           "doc_recall": 0.7685,
           "doc_f1": 0.8691,
-          "latency_ms_p50": 39.0,
-          "latency_ms_p95": 84.3,
+          "latency_ms_p50": 34.5,
+          "latency_ms_p95": 80.1,
           "per_family": {},
           "per_language": {
             "en": {
@@ -303,7 +303,7 @@
           }
         }
       },
-      "latency_ms_p50": 78.1,
+      "latency_ms_p50": 79.2,
       "model": "Horizon-Labs/prompt-injection-guard-small"
     },
     "horizon-base": {
@@ -312,12 +312,12 @@
           "docs": 62,
           "planted": 48,
           "escape_rate": 0.0625,
-          "overstrip_rate": 1.4377,
+          "overstrip_rate": 0.5898,
           "doc_precision": 0.8491,
           "doc_recall": 0.9375,
           "doc_f1": 0.8911,
-          "latency_ms_p50": 170.5,
-          "latency_ms_p95": 205.9,
+          "latency_ms_p50": 162.2,
+          "latency_ms_p95": 195.6,
           "per_family": {
             "encoding": {
               "escape_rate": 0.0,
@@ -371,12 +371,12 @@
           "docs": 900,
           "planted": 479,
           "escape_rate": 0.1524,
-          "overstrip_rate": 0.1501,
+          "overstrip_rate": 0.1305,
           "doc_precision": 0.8657,
           "doc_recall": 0.8476,
           "doc_f1": 0.8565,
-          "latency_ms_p50": 183.1,
-          "latency_ms_p95": 490.9,
+          "latency_ms_p50": 198.6,
+          "latency_ms_p95": 489.5,
           "per_family": {
             "encoding-b64": {
               "escape_rate": 0.0,
@@ -442,8 +442,8 @@
           "doc_precision": 1.0,
           "doc_recall": 0.8424,
           "doc_f1": 0.9144,
-          "latency_ms_p50": 98.3,
-          "latency_ms_p95": 184.6,
+          "latency_ms_p50": 92.0,
+          "latency_ms_p95": 164.1,
           "per_family": {},
           "per_language": {
             "en": {
@@ -453,7 +453,7 @@
           }
         }
       },
-      "latency_ms_p50": 156.6,
+      "latency_ms_p50": 172.3,
       "model": "Horizon-Labs/prompt-injection-guard-base"
     }
   }

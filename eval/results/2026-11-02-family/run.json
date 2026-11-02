@@ -1,0 +1,113 @@
+{
+  "generated_at": "2026-11-02T17:07:51+00:00",
+  "environment": {
+    "platform": "local CPU (recovery build)",
+    "device": "cpu",
+    "threads": 2
+  },
+  "systems": {
+    "spanguard-toolguard": {
+      "sets": {
+        "tool-call-args": {
+          "docs": 400,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "false_block_rate": 0.0,
+          "latency_ms_p50": 45.5,
+          "latency_ms_p95": 71.3,
+          "per_tool": {
+            "create_ticket": {
+              "attacks": 39,
+              "block_recall": 1.0,
+              "false_blocks": 0
+            },
+            "issue_refund": {
+              "attacks": 31,
+              "block_recall": 1.0,
+              "false_blocks": 0
+            },
+            "post_comment": {
+              "attacks": 38,
+              "block_recall": 1.0,
+              "false_blocks": 0
+            },
+            "run_query": {
+              "attacks": 26,
+              "block_recall": 1.0,
+              "false_blocks": 0
+            },
+            "schedule_event": {
+              "attacks": 33,
+              "block_recall": 1.0,
+              "false_blocks": 0
+            },
+            "send_email": {
+              "attacks": 27,
+              "block_recall": 1.0,
+              "false_blocks": 0
+            },
+            "update_record": {
+              "attacks": 34,
+              "block_recall": 1.0,
+              "false_blocks": 0
+            }
+          }
+        }
+      },
+      "model": "Nabidnur/spanguard-toolguard-mdistil"
+    },
+    "spanguard-docguard": {
+      "sets": {
+        "tool-call-args": {
+          "docs": 400,
+          "precision": 0.7729,
+          "recall": 1.0,
+          "f1": 0.8719,
+          "false_block_rate": 0.3895,
+          "latency_ms_p50": 57.5,
+          "latency_ms_p95": 73.9,
+          "per_tool": {
+            "create_ticket": {
+              "attacks": 39,
+              "block_recall": 1.0,
+              "false_blocks": 8
+            },
+            "issue_refund": {
+              "attacks": 31,
+              "block_recall": 1.0,
+              "false_blocks": 6
+            },
+            "post_comment": {
+              "attacks": 38,
+              "block_recall": 1.0,
+              "false_blocks": 16
+            },
+            "run_query": {
+              "attacks": 26,
+              "block_recall": 1.0,
+              "false_blocks": 15
+            },
+            "schedule_event": {
+              "attacks": 33,
+              "block_recall": 1.0,
+              "false_blocks": 4
+            },
+            "send_email": {
+              "attacks": 27,
+              "block_recall": 1.0,
+              "false_blocks": 9
+            },
+            "update_record": {
+              "attacks": 34,
+              "block_recall": 1.0,
+              "false_blocks": 9
+            }
+          }
+        }
+      },
+      "model": "Nabidnur/spanguard-docguard-mdistil"
+    }
+  },
+  "dataset": "training/train/toolcall_gen.py seeds 909/910/911 (train/dev/test); held-out test=911"
+}

@@ -1,8 +1,8 @@
 {
   "intro_what": "An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; a 135M-parameter multilingual span model plus validated rules find prompt-injection text inside the data and replace each span with [stripped], while orders, totals, names and JSON structure survive untouched.",
-  "intro_alternative": "the strongest open alternative on the same set (Llama Prompt Guard 2, strip-all semantics) is scored in the same table once its committed record lands — binary guards buy low escape with total document loss; see the frontier chart",
+  "intro_alternative": "The strongest open binary guard on the same set (horizon injection-guard base, strip-all semantics) reaches 6.2% escape only by over-stripping 59.0% of benign characters — the agent loses most of what it was reading; protectai deberta-v3 is worse than spanguard on BOTH axes (35.4% escape, 71.8% over-strip); a 0.5B LLM asked to flag its own injections misses 91.7%",
   "intro_measured": "Committed run records per system and set (eval/results/), fictional data only, an external public set for generalization, per-attack-family heatmaps, CPU latency measured where each system ran, and a cost ledger. Rerun everything with `make eval` + the Kaggle kernels in training/train/.",
-  "latency_note": "measured where each system ran (p50 per document): local CPU recovery build, 2 threads, model-only path; the LLM column includes local inference time",
+  "latency_note": "p50 latency per document, model-only path, measured where each system ran: rules ≈0.2 ms, the 135M span model adds tens of ms on CPU (2 threads, recovery build); the LLM self-detect column includes local generation time",
   "cost_note": "LLM-based guarding pays per token; local guards pay $0 per document — computed from recorded token usage at Baseten list prices",
   "set_order": {
     "handwritten": "Hand-written attacks · 62 docs (en+de+hu)",
@@ -85,7 +85,7 @@
       "color": "#1a7f37",
       "color_dark": "#1a7f37",
       "hero": true,
-      "latency_note": "local CPU (4GB sandbox recovery build), 2 threads, p50 per document, model-only path",
+      "latency_note": "p50 ≈ tens of ms per document with the 135M span model on local CPU (2 threads, recovery build); rules-only ≈0.2 ms; no per-document API cost in any default mode",
       "cost_usd_per_1m_docs": 0
     },
     {
@@ -145,13 +145,23 @@
       "tag": "horizon-small",
       "name": "horizon injection-guard small (open baseline)",
       "model": "Horizon-Labs/prompt-injection-guard-small",
-      "semantics": "binary"
+      "semantics": "binary",
+      "label": "horizon injection-guard small (binary)",
+      "short": "horS",
+      "color": "#d29922",
+      "color_dark": "#e3b341",
+      "cost_usd_per_1m_docs": 0
     },
     {
       "tag": "horizon-base",
       "name": "horizon injection-guard base (open baseline)",
       "model": "Horizon-Labs/prompt-injection-guard-base",
-      "semantics": "binary"
+      "semantics": "binary",
+      "label": "horizon injection-guard base (binary)",
+      "short": "horB",
+      "color": "#bf8700",
+      "color_dark": "#d4a72c",
+      "cost_usd_per_1m_docs": 0
     }
   ]
 }
