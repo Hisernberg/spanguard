@@ -1,23 +1,36 @@
-"""Detector pipeline: rules / fast (rules+model) / audit (rules+model+LLM)."""
+"""Detector pipeline: rules / fast (rules+model) / fast-v2 (structure-aware
+ensemble of rules + span model + char model) / audit (rules+model+LLM)."""
 
 from __future__ import annotations
 
+import re
 import time
 
 from ..types import Result
 from . import rules as rules_mod
 from .strip import strip_spans
 
+_PROSE_HIGH_CONF = 0.75   # span-model confidence floor on unstructured text
+_PROSE_CHAR_BUMP = 0.1    # char-model threshold bump on unstructured text
+_STRUCTURED = re.compile(r"\{|\}|^\s*\w+=\S+|\s\|\s", re.M)
+
+
+def is_structured(text: str) -> bool:
+    """Tool-output-ish (JSON braces, k=v, pipe tables) vs prose (web pages,
+    user prompts). The two channels need different precision/recall tradeoffs."""
+    return bool(_STRUCTURED.search(text))
+
 
 class Guard:
     """One guard instance; mode selects detectors, one shared SpanModel."""
 
     def __init__(self, mode: str = "fast", model_id: str | None = None, threshold: float = 0.5):
-        if mode not in {"rules", "fast", "audit"}:
+        if mode not in {"rules", "fast", "fast-v2", "audit"}:
             raise ValueError(f"unknown mode {mode!r}")
         self.mode = mode
         self.threshold = threshold
         self._model = None
+        self._char = None
         self.model_id = model_id
         self.last_latency_ms: float | None = None
 
@@ -29,14 +42,35 @@ class Guard:
             self._model = SpanModel(self.model_id)
         return self._model
 
+    @property
+    def char_model(self):
+        if self._char is None:
+            from .char_guard import char_spans  # noqa: PLC0415 - optional dependency
+
+            self._char = char_spans
+        return self._char
+
     def guard(self, text: str) -> Result:
         t0 = time.monotonic()
         spans = rules_mod.detect_rules(text)
-        if self.mode in {"fast", "audit"}:
+        if self.mode in {"fast", "fast-v2", "audit"}:
             try:
-                spans += self.model.spans(text, threshold=self.threshold)
+                model_spans = self.model.spans(text, threshold=self.threshold)
+                if self.mode == "fast-v2" and not is_structured(text):
+                    model_spans = [s for s in model_spans if s.confidence >= _PROSE_HIGH_CONF]
+                spans += model_spans
             except ImportError:
                 pass  # model extra not installed: rules still ran
+        if self.mode == "fast-v2":
+            try:
+                thr = self.char_threshold(text)
+                char_spans, _ = self.char_model(text, threshold=thr)
+                existing = [(x.start, x.end) for x in spans]
+                for a, b in char_spans:
+                    if not any(ra < b and a < rb for ra, rb in existing):
+                        spans.append(_mk_span(text, a, b))
+            except (ImportError, FileNotFoundError, OSError):
+                pass  # char extra not trained/installed: rules+model still ran
         result = strip_spans(text, spans)
         if self.mode == "audit":
             from .audit import AuditDetector, audit_spans  # noqa: PLC0415 - lazy
@@ -49,13 +83,32 @@ class Guard:
         self.last_latency_ms = round((time.monotonic() - t0) * 1000, 1)
         return result
 
+    def char_threshold(self, text: str) -> float | None:
+        """Calibrated char threshold, bumped up on prose to protect over-strip."""
+        try:
+            from .char_guard import _load  # noqa: PLC0415
+
+            _, _, calib = _load(None)
+            base = calib.get("threshold", 0.5)
+            return base + (_PROSE_CHAR_BUMP if not is_structured(text) else 0.0)
+        except (ImportError, FileNotFoundError, OSError):
+            return None
+
     def detectors(self) -> list[str]:
         d = ["rules"]
-        if self.mode in {"fast", "audit"}:
+        if self.mode in {"fast", "fast-v2", "audit"}:
             d.append("model")
+        if self.mode == "fast-v2":
+            d.append("char")
         if self.mode == "audit":
             d.append("audit")
         return d
+
+
+def _mk_span(text: str, a: int, b: int):
+    from ..types import Span  # noqa: PLC0415
+
+    return Span(start=a, end=b, confidence=0.6, model="spanguard-char")
 
 
 def _shift(first_result: Result, spans: list):

@@ -132,6 +132,20 @@ def run_eval(systems: list[str], sets: list[str], tag: str | None = None, limit:
             except Exception as exc:  # noqa: BLE001
                 print(f"skip spanguard-fast: {exc}")
                 continue
+        elif sysname == "spanguard-fast-v2":
+            try:
+                fn = guard_system("fast-v2")
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spanguard-fast-v2: {exc}")
+                continue
+        elif sysname == "spanguard-char":
+            try:
+                from ..detect.char_guard import char_guard_system  # noqa: PLC0415
+
+                fn = char_guard_system()
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spanguard-char: {exc}")
+                continue
         elif sysname.startswith("baseline:"):
             rec_path = RESULTS / sysname.split(":", 1)[1]
             record = json.loads(Path(rec_path).read_text())
