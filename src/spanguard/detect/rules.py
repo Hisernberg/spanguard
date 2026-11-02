@@ -36,7 +36,7 @@ def _p(name: str, kind: str, conf: float, pattern: str, flags: re.RegexFlag = re
 _p("override-ignore", "override", 0.95,
    r"\b(?:ignore|disregard|forget|discard|override)\s+(?:all\s+|any\s+|the\s+|your\s+|their\s+|all\s+of\s+the\s+|any\s+of\s+the\s+|the\s+above\s+|your\s+prior\s+|"
    r"(?:all\s+)?(?:previous|prior|earlier|above|preceding)[\w\s]{0,20}?)?"
-   r"(?:instructions?|prompts?|directions?|rules?|guidelines?|constraints?|context|message|messages|task)\b")
+   r"(?:instructions?|prompts?|directions?|rules?|guidelines?|constraints?|context|conversation|message|messages|task)\b")
 _p("override-replace", "override", 0.9,
    r"\b(?:from\s+now\s+on|henceforth|instead)\b[^.\n]{0,60}\b(?:you\s+(?:are|must|will|should|have\s+to)|your\s+(?:task|goal|job|instructions?))\b")
 _p("override-newtask", "override", 0.85,

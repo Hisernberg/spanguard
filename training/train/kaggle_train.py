@@ -144,7 +144,8 @@ trainer.train()
 def predict_spans(doc):
     text = doc["text"]
     enc = tok(text, return_offsets_mapping=True, truncation=True, max_length=MAX_LEN,
-              stride=STRIDE, return_overflowing_tokens=True, return_tensors="pt")
+              stride=STRIDE, return_overflowing_tokens=True, padding="max_length",  # uneven last window crashes tensor stacking
+              return_tensors="pt")
     offsets = enc.pop("offset_mapping")[0].tolist()
     enc.pop("overflow_to_sample_mapping", None)
     with torch.no_grad():

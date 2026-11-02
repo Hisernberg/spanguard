@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-11-02T17:13:52+00:00",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-5.10.134-013.15.kangaroo.al8.x86_64-x86_64-with-glibc2.41"
+  },
+  "systems": {
+    "spanguard-fast": {
+      "sets": {
+        "handwritten": {
+          "docs": 5,
+          "planted": 5,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.0,
+          "doc_precision": 1.0,
+          "doc_recall": 1.0,
+          "doc_f1": 1.0,
+          "span_precision": 0.6667,
+          "span_recall": 0.8,
+          "span_f1": 0.7273,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 5
+            }
+          },
+          "per_family": {
+            "exfil-secret": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "exfil-url": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "impersonation": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "override": {
+              "escape_rate": 0.0,
+              "planted": 2
+            }
+          }
+        }
+      },
+      "wallclock_s": 4
+    }
+  }
+}
