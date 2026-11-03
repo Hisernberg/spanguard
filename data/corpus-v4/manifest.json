@@ -1,0 +1,35 @@
+{
+  "generator": "training/gen_corpus_v4.py",
+  "deterministic": true,
+  "fictional_only": true,
+  "seeds": {
+    "train": 808,
+    "dev": 909,
+    "test": 404
+  },
+  "new_families": [
+    "log-poison",
+    "code-comment",
+    "rag-chunk",
+    "mcp-poison",
+    "skill-file",
+    "buried-multihop",
+    "md-image-exfil",
+    "social-polite"
+  ],
+  "languages": [
+    "en",
+    "de",
+    "hu",
+    "fr",
+    "bn",
+    "ar",
+    "ja"
+  ],
+  "sizes": {
+    "train": 16000,
+    "dev": 1800,
+    "test": 1000
+  },
+  "note": "v4 domain expansion round 2: log-poison, code-comment (repo poisoning), rag-chunk carriers; Arabic (RTL) and Japanese added as in-domain; zero-shot washout on these measured and committed BEFORE v4 training."
+}
