@@ -25,11 +25,18 @@ injection is a span problem, not a document-classification problem.
 
 ## 3. What does it measure? (the honest core)
 
-| Set (all fictional / public, never our own claims) | spanguard fast-v2 | spanguard char (0.79M) | spanguard fast | rules-only | Qwen2.5-0.5B self-detect | protectai deberta-v3 | horizon small (binary) | horizon base (binary) |
-|---|---|---|---|---|---|---|---|---|
-| Hand-written attacks · 62 docs (en/de/hu) | **10.4% · 14.0%** | **4.2% · 18.3%** | 29.2% · 11.3% | 72.9% · 7.5% | 91.7% · 13.1% | 35.4% · 71.8% | 8.3% · 37.7% | 6.2% · 59.0% |
-| Agent traffic · 900 docs (synthetic tool output) | **0.0% · 4.3%** | 0.2% · 2.8% | 0.0% · 3.3% | 13.4% · 3.3% | 97.5% · 5.1% | 43.6% · 48.0% | 12.5% · 6.3% | 15.2% · 13.1% |
-| Public prompts · 452 docs (deepset, external) | **0.0% · 32.9%** | 0.0% · 33.6% | 0.0% · 34.2% | 0.0% · 0.1% | 0.0% · 5.0% | 0.0% · 1.2% | 0.0% · 0.0% | 0.0% · 0.0% |
+| Set (all fictional / public, never our own claims) | spanguard fast-v2 | spanguard char (0.79M) | spanguard fast | fast (corpus-v2 model) | rules-only | Qwen2.5-0.5B self-detect | protectai deberta-v3 | horizon small (binary) | horizon base (binary) |
+|---|---|---|---|---|---|---|---|---|---|
+| Hand-written attacks · 62 docs (en/de/hu) | **10.4% · 14.0%** | **4.2% · 18.3%** | 29.2% · 11.3% | 33.3% · 6.9% | 72.9% · 7.5% | 91.7% · 13.1% | 35.4% · 71.8% | 8.3% · 37.7% | 6.2% · 59.0% |
+| Agent traffic · 900 docs (synthetic tool output) | **0.0% · 4.3%** | 0.2% · 2.8% | 0.0% · 3.3% | 0.0% · 4.0% | 13.4% · 3.3% | 97.5% · 5.1% | 43.6% · 48.0% | 12.5% · 6.3% | 15.2% · 13.1% |
+| Public prompts (benign-only probe) · 452 docs | **0.0% · 32.9%** | 0.0% · 33.6% | 0.0% · 34.2% | **0.0% · 18.1%** | 0.0% · 0.1% | 0.0% · 5.0% | 0.0% · 1.2% | 0.0% · 0.0% | 0.0% · 0.0% |
+
+The corpus-v2 retrain (boundary-weighted loss, 3x hard negatives) is a textbook
+precision/recall trade in the open: it nearly halves over-stripping on the public
+probe (34.2% → 18.1%) and cuts hand-written over-strip 11.3% → 6.9%, at the cost
+of a slightly WORSE hand-written escape (29.2% → 33.3%). We publish that shift
+rather than cherry-picking the flattering axis; the fast-v2 ensemble keeps the
+balanced operating point.
 
 Cells are **escape % · over-strip %**. Four readings the table gives away for free:
 

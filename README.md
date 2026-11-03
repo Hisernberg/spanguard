@@ -242,6 +242,19 @@ Indirect prompt injection is mainstream agent security; here is how spanguard si
 
 **Meta stack use.** Muse Spark Open runs inside spanguard twice, both logged: the teacher pass ($3.91, 1,150 calls — an independent precision check on the generator) and the opt-in `audit` mode for ambiguous remnants. It is not a hidden dependency of the detector itself.
 
+## Adaptive red-team loop (idea A, first cut)
+
+An LLM attacker (`z-ai` chat access) rewrites each seed payload against the LIVE
+fast-v2 guard for up to 6 rounds, with the constraint that the core instruction
+(action + target) stays the same — the "attacker moves second" setup. Across
+5 seed families (exfil, exfil-url, override, secret, polite social-engineering)
+the attacker produced **25 real mutations and 0 escapes in 30 attempts**
+(`eval/results/redteam-v3-0300/run.json`, escape-per-round all 0.0). Honest
+caveats, which is why this is a first cut: one attacker prompt per round, 6
+rounds per seed, and the core-instruction check is substring-verbatim — an
+attacker that rephrases the action itself would need a semantic escape judge
+(the roadmap's end-to-end AgentDojo harness covers that case).
+
 ## Roadmap (stated, not claimed)
 
 - **Task-conditioned stripping (B)** — feed the user's goal alongside tool output (cross-encoder): legitimate task-relevant instructions survive, off-task ones get stripped. Attacks the 14–33% over-strip axis directly.
