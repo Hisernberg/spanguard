@@ -63,12 +63,13 @@ def main() -> None:
     ap.add_argument("--epochs", type=int, default=2)
     ap.add_argument("--batch", type=int, default=12)
     ap.add_argument("--out", default="data/models/spanguard-char")
+    ap.add_argument("--corpus", default="data/corpus-v2")
     args = ap.parse_args()
 
-    docs = [json.loads(l) for l in open("data/corpus-v2/train.jsonl", encoding="utf-8")]
+    docs = [json.loads(l) for l in open(f"{args.corpus}/train.jsonl", encoding="utf-8")]
     if args.train_limit:
         docs = docs[: args.train_limit]
-    dev_all = [json.loads(l) for l in open("data/corpus-v2/dev.jsonl", encoding="utf-8")]
+    dev_all = [json.loads(l) for l in open(f"{args.corpus}/dev.jsonl", encoding="utf-8")]
     dev = dev_all[:600]  # sweep subset; full dev stays for the transformer v2
     print(f"train {len(docs)} dev {len(dev)}", flush=True)
 
@@ -173,7 +174,7 @@ def main() -> None:
     print(json.dumps(sweep, indent=1))
     best_thr = min(sweep, key=lambda t: sweep[t]["escape"] + sweep[t]["overstrip"])
     (out / "calibration.json").write_text(json.dumps(
-        {"threshold": best_thr, "sweep": sweep, "corpus": "corpus-v2", "boundary_weight": BOUNDARY_W},
+        {"threshold": best_thr, "sweep": sweep, "corpus": args.corpus, "boundary_weight": BOUNDARY_W},
         indent=1))
     print("saved", out, "threshold", best_thr)
 

@@ -1,0 +1,30 @@
+{
+  "generator": "training/gen_corpus_v3.py",
+  "deterministic": true,
+  "fictional_only": true,
+  "seeds": {
+    "train": 606,
+    "dev": 707,
+    "test": 303
+  },
+  "new_families": [
+    "mcp-poison",
+    "skill-file",
+    "buried-multihop",
+    "md-image-exfil",
+    "social-polite"
+  ],
+  "languages": [
+    "en",
+    "de",
+    "hu",
+    "fr",
+    "bn"
+  ],
+  "sizes": {
+    "train": 14000,
+    "dev": 1600,
+    "test": 900
+  },
+  "note": "v3 domain expansion: MCP tool-description poisoning, agent skill files, buried multi-hop payloads, markdown-image exfil, polite social engineering; bn added; benign traps follow the red-team findings and NotInject-style FP bait."
+}
