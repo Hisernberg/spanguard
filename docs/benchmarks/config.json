@@ -2,12 +2,12 @@
   "intro_what": "An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; validated rules, a 135M-parameter multilingual span model and a 0.79M char-level multi-task model find prompt-injection text inside the data and replace each span with [stripped], while orders, totals, names and JSON structure survive untouched. The fast-v2 ensemble gates the detectors by document structure: high-recall union on tool output, corroboration on prose.",
   "intro_alternative": "The strongest open binary guard on the same set (horizon injection-guard base, strip-all semantics) reaches 6.2% escape only by over-stripping 59.0% of benign characters \u2014 the agent loses most of what it was reading; protectai deberta-v3 is worse than spanguard on BOTH axes (35.4% escape, 71.8% over-strip); a 0.5B LLM asked to flag its own injections misses 91.7% of attacks. spanguard's char-only tier trades a further escape cut (4.2%) for 18.3% over-strip when security outweighs data fidelity.",
   "intro_measured": "Committed run records per system and set (eval/results/), fictional data only, an external public set for generalization, per-attack-family heatmaps, CPU latency measured where each system ran, and a cost ledger. Rerun everything with `make eval` + the Kaggle kernels in training/train/.",
-  "latency_note": "p50 latency per document, model-only path, measured where each system ran: rules \u22480.2 ms, the 135M span model adds tens of ms on CPU (2 threads, recovery build); the LLM self-detect column includes local generation time",
+  "latency_note": "p50 latency per document, measured where each system ran (records carry p50/p95): rules 0.2 ms, spanguard fast (135M span model, CPU 2 threads) 277 ms, spanguard char (0.79M) ~2 ms, horizon-small (binary, strip-all) 87.5 ms, protectai deberta 253.5 ms; the LLM self-detect column includes local generation time. Latency is the honest cost of span-level multilingual detection on CPU; spanguard-char is the sub-ms tier when that matters more than escape rate.",
   "cost_note": "LLM-based guarding pays per token; local guards pay $0 per document \u2014 computed from recorded token usage at Baseten list prices",
   "set_order": {
     "handwritten": "Hand-written attacks \u00b7 62 docs (en+de+hu)",
     "agent-traffic": "Agent traffic \u00b7 900 docs (synthetic tool output)",
-    "public-deepset": "Public prompts \u00b7 452 docs (deepset, external)"
+    "public-deepset": "Public prompts (benign-only over-strip probe) \u00b7 452 docs \u00b7 escape column n/a \u2014 the set plants no attacks"
   },
   "axes": {
     "handwritten": {
@@ -200,5 +200,6 @@
       "cost_usd_per_1m_docs": 0,
       "hero": null
     }
-  ]
+  ],
+  "intro_escape_def": "escape = share of planted attack payloads that survive VERBATIM after guarding (one stripped character counts as caught); over-strip = share of benign characters destroyed on clean documents. Wilson 95% CIs are quoted beside headline numbers."
 }

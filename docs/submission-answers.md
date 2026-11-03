@@ -54,7 +54,7 @@ Cells are **escape % · over-strip %**. Four readings the table gives away for f
 - Binary baselines are scored with strip-all semantics: one bit → the whole document
   is lost. That is what a 1-bit classifier can actually do operationally.
 
-## 4. The model family (4 models, all trained locally on CPU)
+## 4. The model family (4 models; span models on free Kaggle GPU, the rest on local CPU)
 
 | Model | Task | Result | HF |
 |---|---|---|---|
@@ -75,7 +75,7 @@ Records: `eval/results/2026-11-02-family/run.json`, `eval/results/fastv2-corrob-
 
 ## 5. What did you build?
 
-- `spanguard` pip package: rules engine (22 patterns), span model wrapper, audit mode
+- `spanguard` pip package: rules engine (18 patterns), span model wrapper, audit mode
   (optional LLM), OpenAI-compatible gateway (FastAPI) with `/v1/chat/completions`
   request inspection and tool-result cleaning, plus `/guard` JSON API.
 - Deterministic fictional corpus generator (en/de/hu, 10 attack families + benign
@@ -90,13 +90,15 @@ Records: `eval/results/2026-11-02-family/run.json`, `eval/results/fastv2-corrob-
 
 ## 6. How did you build it? (stack + constraints)
 
-Local CPU-only sandbox (4GB RAM, no GPU): distil-multilingual-CASE backbone for all three
-models; the trainer pre-tokenizes to fixed windows and uses Adafactor (no Adam moment
-buffers) so 541MB models train inside 4GB; models checkpoint to disk and publish to the
-Hugging Face Hub. The original plan (Kaggle GPU + Baseten teacher) died twice on platform
-outages — the recovery trainer was written to make the whole pipeline reproducible on a
-laptop. Every failure mode we hit is documented in the repo (`worklog`-style commits,
-commit-by-commit).
+The compute story has three honest tiers. The 135M span models (v1 and the corpus-v2
+retrain) trained on free Kaggle GPUs — the kernels are committed and re-runnable. The
+smaller family models (docguard, toolguard, and the 0.79M char model) trained locally on
+a 4GB CPU-only sandbox using Adafactor so 541MB models fit in memory. The Muse Spark Open
+teacher pass ran exactly once — 1,150 calls, $3.91, logged in `data/corpus-manifest.json` —
+as a precision check on the deterministic generator labels, not as the label source: it
+recovered 62.5% of planted spans and hallucinated zero extra ones, so `planted ∪ teacher
+== planted`. Platform outages along the way are why the recovery trainer exists; every
+failure mode is documented in worklog-style commits.
 
 ## 7. What was hard?
 

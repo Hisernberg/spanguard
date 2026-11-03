@@ -39,7 +39,7 @@ $ docker compose up -d && curl -s localhost:8819/guard -d @payload.json
   \"carrier_note\": \"Delayed. [stripped]\", \"total_eur\": 129.90}"}
 ```
 
-VO: "A 135M-parameter multilingual span model plus 22 rules found exactly the
+VO: "A 135M-parameter multilingual span model plus 18 rules found exactly the
 attack span — 100 characters — and replaced it. The order, the status, the total:
 untouched. And because the guard returns *spans*, we can measure both failure
 directions honestly."
