@@ -85,7 +85,7 @@
       "color": "#1a7f37",
       "color_dark": "#1a7f37",
       "hero": null,
-      "latency_note": "p50 \u2248 tens of ms per document with the 135M span model on local CPU (2 threads, recovery build); rules-only \u22480.2 ms; no per-document API cost in any default mode",
+      "latency_note": "p50 latency per document, measured where each system ran (records carry p50/p95): rules 0.2 ms, spanguard fast (135M span model, CPU 2 threads) 277 ms, spanguard char (0.79M) ~2 ms, horizon-small (binary, strip-all) 87.5 ms, protectai deberta 253.5 ms; the LLM self-detect column includes local generation time. Latency is the honest cost of span-level multilingual detection on CPU; spanguard-char is the sub-ms tier when that matters more than escape rate.",
       "cost_usd_per_1m_docs": 0
     },
     {

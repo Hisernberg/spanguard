@@ -53,7 +53,7 @@ def llm(payload: str, feedback: str) -> str:
     try:
         out = subprocess.run(["z-ai", "chat", "-p", prompt], capture_output=True, text=True,
                              timeout=90, check=True)
-        m = re.search(r"\{.*\}", out.stdout, re.S)
+        m = re.search(r"\{.*\}", out.stdout, re.DOTALL)
         if not m:
             return payload
         return json.loads(m.group(0))["choices"][0]["message"]["content"].strip()

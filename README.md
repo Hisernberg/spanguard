@@ -298,9 +298,10 @@ If you use spanguard or the benchmark protocol, please cite the repo:
 
 - **Meta open weights**: the opt-in audit mode runs Meta's Muse Spark Open
   (`meta-models/muse-spark-open-1026`) as a second opinion on already-stripped text; the
-  guard itself is a fine-tuned open-weights model. The optional teacher pass ships as
-  tooling with cost tracking — it never ran against paid inference, and no token cost is
-  claimed anywhere in this repo.
+  guard itself is a fine-tuned open-weights model. The teacher pass ran ONCE — 1,150
+  calls, $3.91, logged in `data/corpus-manifest.json` — as an independent precision check
+  on the deterministic labels (it recovered 62.5% of planted spans and hallucinated zero
+  teacher-only ones); audit mode is off by default and carries no per-document cost.
 - **Demo**: 3-minute walkthrough video (script in [docs/demo-video-script.md](docs/demo-video-script.md))
   + the live demo UI served by the gateway at `/` and the static Space linked above.
 - Solo project by Nabid Nur Abrar ([@Hisernberg](https://github.com/Hisernberg)) — Indie track.
