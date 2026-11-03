@@ -27,7 +27,7 @@ class Guard:
 
     def __init__(self, mode: str = "fast", model_id: str | None = None, threshold: float = 0.5,
                  typed_markers: bool = True):
-        if mode not in {"rules", "fast", "fast-v2", "audit"}:
+        if mode not in {"rules", "fast", "fast-v2", "fast-v3", "audit"}:
             raise ValueError(f"unknown mode {mode!r}")
         self.mode = mode
         self.threshold = threshold
@@ -61,24 +61,32 @@ class Guard:
         t0 = time.monotonic()
         spans = rules_mod.detect_rules(text)
         model_spans_kept: list = []
-        if self.mode in {"fast", "fast-v2", "audit"}:
+        if self.mode in {"fast", "fast-v2", "fast-v3", "audit"}:
             try:
                 model_spans = self.model.spans(text, threshold=self.threshold)
-                if self.mode == "fast-v2" and not is_structured(text):
+                if self.mode in {"fast-v2", "fast-v3"} and not is_structured(text):
                     model_spans = [s for s in model_spans if s.confidence >= _PROSE_HIGH_CONF]
-                if self.mode == "fast-v2":
+                if self.mode in {"fast-v2", "fast-v3"}:
                     model_spans_kept = model_spans  # ensemble decides below
                 else:
                     spans += model_spans
             except ImportError:
                 if "model:torch-not-installed" not in self.degraded:
                     self.degraded.append("model:torch-not-installed")  # visible in /healthz
-        if self.mode == "fast-v2":
+        if self.mode in {"fast-v2", "fast-v3"}:
             try:
                 thr = self.char_threshold(text)
-                char_spans, _ = self.char_model(text, threshold=thr)
+                if self.mode == "fast-v3":
+                    from .router import routed_char_spans
+                    char_spans, _, _route = routed_char_spans(text, threshold=thr)
+                else:
+                    char_spans, _ = self.char_model(text, threshold=thr)
                 self._char_ok = True
                 prose = not is_structured(text)
+                if self.mode == "fast-v3":
+                    from .router import is_extended_domain
+                    if is_extended_domain(text):
+                        prose = False  # routed docs trust the in-domain char model (union)
                 if prose:
                     # Corroboration channel: on prose (web pages, user prompts) both
                     # neural detectors false-positive more, so a finding survives
@@ -118,12 +126,29 @@ class Guard:
         return result
 
     def char_threshold(self, text: str) -> float | None:
-        """Calibrated char threshold, bumped up on prose to protect over-strip."""
+        """Calibrated char threshold, bumped up on prose to protect over-strip.
+        fast-v3 reads the ROUTED model's calibration (v3 models calibrate lower)."""
         try:
+            import os
+
             from .char_guard import _load
 
-            _, _, calib = _load(None)
+            if self.mode == "fast-v3":
+                from .router import is_extended_domain
+
+                dir_path = (os.environ.get("SPANGUARD_CHAR_MODEL_V3")
+                            if is_extended_domain(text) else os.environ.get("SPANGUARD_CHAR_MODEL"))
+            else:
+                dir_path = None
+            _, _, calib = _load(dir_path)
             base = calib.get("threshold", 0.5)
+            if self.mode == "fast-v3":
+                from .router import is_extended_domain
+                # prose bump protects against neural FPs on out-of-domain prose;
+                # routed (in-domain) docs use the routed model's own calibration
+                bump = 0.0 if is_extended_domain(text) else (
+                    _PROSE_CHAR_BUMP if not is_structured(text) else 0.0)
+                return base + bump
             return base + (_PROSE_CHAR_BUMP if not is_structured(text) else 0.0)
         except (ImportError, FileNotFoundError, OSError):
             return None
@@ -138,8 +163,8 @@ class Guard:
         d = ["rules"]
         if self.mode in {"fast", "fast-v2", "audit"} and self._model_ok:
             d.append("model")
-        if self.mode == "fast-v2" and self._char_ok:
-            d.append("char")
+        if self.mode in {"fast-v2", "fast-v3"} and self._char_ok:
+            d.append("char" if self.mode == "fast-v2" else "char-router(v2+v3)")
         if self.mode == "audit" and self._model_ok:
             d.append("audit")
         return d

@@ -48,9 +48,9 @@ def char_spans(text: str, dir_path: str | None = None, threshold: float | None =
     return spans, doc_p
 
 
-def char_guard_system(mode: str = "char"):
+def char_guard_system(mode: str = "char", model_dir: str | None = None):
     def fn(doc: dict):
-        spans, _doc_p = char_spans(doc["text"])
+        spans, _doc_p = char_spans(doc["text"], dir_path=model_dir)
         findings = [Finding(start=a, end=b, length=b - a, kind="char-span",
                             source="spanguard-char", confidence=1.0, sha256="")
                     for a, b in spans]

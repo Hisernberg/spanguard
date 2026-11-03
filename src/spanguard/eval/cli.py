@@ -23,6 +23,7 @@ SET_FILES = {
     "handwritten": ["handwritten-en.jsonl", "handwritten-de.jsonl", "handwritten-hu.jsonl"],
     "agent-traffic": ["agent-traffic.jsonl"],
     "public-deepset": ["public-deepset.jsonl"],
+    "extended-attacks": ["extended-attacks.jsonl"],
 }
 
 
@@ -144,6 +145,21 @@ def run_eval(systems: list[str], sets: list[str], tag: str | None = None, limit:
                 fn = guard_system("fast")
             except Exception as exc:  # noqa: BLE001
                 print(f"skip spanguard-fast-mdistil-v2: {exc}")
+                continue
+        elif sysname == "spanguard-fast-v3":
+            try:
+                fn = guard_system("fast-v3")
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spanguard-fast-v3: {exc}")
+                continue
+        elif sysname == "spanguard-char-v3":
+            try:
+                from ..detect.char_guard import char_guard_system
+
+                # explicit dir — do NOT depend on SPANGUARD_CHAR_MODEL pointing here
+                fn = char_guard_system(model_dir=str(REPO / "data" / "models" / "spanguard-char-v3"))
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spanguard-char-v3: {exc}")
                 continue
         elif sysname == "spanguard-char":
             try:

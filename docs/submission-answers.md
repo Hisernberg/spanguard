@@ -68,6 +68,17 @@ with span F1 0.996 where char-v2 scored 11.6% / 0.467. The trade is published to
 char-v3 regresses on the original hand-written OOD set (4.2% → 12.5%). Both models
 ship; per-domain routing is roadmap.
 
+**v3.1 flagship record.** fast-v3 (rules + 135M span + char router with Bangla
+detection) scores **0.0% escape / 0.0% over-strip / doc F1 1.000 on the committed
+extended-attacks fixture** where protectai deberta-v2 escapes 84.3% and the horizon
+binaries 8.6–10% — the buried-signal washout of whole-sequence classifiers,
+measured on our own data. The router fix (bn → char-v3, union path for routed
+docs) was found by the visual-inference demo catching a real Bangla escape, then
+verified by tests and a re-run record. Two span variants ship with their trade
+published: span-v2 (0.0% extended escape, 19.8% public over-strip, 16.7%
+hand-written escape) and span-v1 (10.4% hand-written escape, 32.9% public
+over-strip).
+
 ## 4. The model family (4 models; span models on free Kaggle GPU, the rest on local CPU)
 
 | Model | Task | Result | HF |

@@ -1,0 +1,72 @@
+{
+  "generated_at": "2026-11-03T15:03:35+00:00",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-5.10.134-013.15.kangaroo.al8.x86_64-x86_64-with-glibc2.41"
+  },
+  "systems": {
+    "spanguard-fast-v3": {
+      "sets": {
+        "extended-attacks": {
+          "docs": 88,
+          "planted": 84,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.0,
+          "doc_precision": 1.0,
+          "doc_recall": 1.0,
+          "doc_f1": 1.0,
+          "span_precision": 0.6848,
+          "span_recall": 0.75,
+          "span_f1": 0.7159,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "bn": {
+              "escape_rate": 0.0,
+              "docs": 17
+            },
+            "de": {
+              "escape_rate": 0.0,
+              "docs": 15
+            },
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 23
+            },
+            "fr": {
+              "escape_rate": 0.0,
+              "docs": 17
+            },
+            "hu": {
+              "escape_rate": 0.0,
+              "docs": 16
+            }
+          },
+          "per_family": {
+            "buried-multihop": {
+              "escape_rate": 0.0,
+              "planted": 28
+            },
+            "mcp-poison": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "md-image-exfil": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "skill-file": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "social-polite": {
+              "escape_rate": 0.0,
+              "planted": 14
+            }
+          }
+        }
+      },
+      "wallclock_s": 114
+    }
+  }
+}

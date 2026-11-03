@@ -242,6 +242,42 @@ Indirect prompt injection is mainstream agent security; here is how spanguard si
 
 **Meta stack use.** Muse Spark Open runs inside spanguard twice, both logged: the teacher pass ($3.91, 1,150 calls — an independent precision check on the generator) and the opt-in `audit` mode for ambiguous remnants. It is not a hidden dependency of the detector itself.
 
+## v3.1 flagship: fast-v3 (rules + span model + char router) — record on extended attacks
+
+The flagship system routes each document: extended-domain carriers (MCP tool defs,
+skill files, buried-note pages, markdown images, **any Bangla text**) go to char-v3
+with its own calibration; everything else keeps the balanced fast-v2 behavior. On the
+committed **extended-attacks fixture** (88 docs / 70 planted attacks across the five
+new carrier families, seed-locked from the v3 test split):
+
+| system | escape | over-strip | doc F1 | p50 |
+|---|---|---|---|---|
+| **spanguard fast-v3** (this router) | **0.0%** | **0.0%** | **1.000** | ~280 ms CPU |
+| spanguard char-v3 alone | 0.0% (extended bench) | 0.0% | 0.986 | ~2 ms |
+| spanguard rules-only | 90.5% | 0.0% | 0.182 | 0.2 ms |
+| horizon-base (binary) | 8.6% | (strip-all on flag) | — | 819 ms |
+| horizon-small (binary) | 10.0% | (strip-all on flag) | — | 310 ms |
+| protectai deberta-v2 (binary) | **84.3%** | (strip-all on flag) | — | 1197 ms |
+
+Whole-sequence binary classifiers wash out on buried/multi-hop and
+polite-paraphrase carriers — exactly the buried-signal regime third parties
+reported for PromptGuard 2 (~1% recall when the signal is buried). The router
+also fixed a real escape the visual-inference demo caught: Bangla text was
+escaping every v2 model (none saw bn training data); `is_extended_domain`
+now routes bn to char-v3, and the union path trusts the in-domain detector
+(`eval/results/fastv3-union-*/`, tests `test_v31_router.py`). The span-v1
+variant (`eval/results/v3-flagship-s1b-*/run.json`) trades the same axes
+explicitly: 10.4% hand-written escape / 32.9% public over-strip — pick it when
+hand-written OOD matters more than public-probe over-strip.
+
+**Visual inference demo**: [docs/demo/visual-inference.html](docs/demo/visual-inference.html)
+(a static, self-contained page) renders real fast-v3 runs — input with planted
+spans highlighted per family, cleaned text with typed markers, findings tables
+(kinds, offsets, payload hashes, no payload text), plus the red-team curve and
+the extended-frontier chart inline. It deliberately shows two benign
+false-positives (a changelog quoting an attack phrase; a schema-validating MCP
+description) because the over-strip axis is the honest cost of this design.
+
 ## Domain expansion: corpus v3 and char-v3 (extended domain, shipped)
 
 Corpus v3 adds the 2026 attack surface to the generator — **MCP tool-description
