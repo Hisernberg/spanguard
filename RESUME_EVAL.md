@@ -1,41 +1,29 @@
-# SpanGuard — v2 track status (2026-11-02 ~19:25 UTC)
+# SpanGuard — v2 track status (2026-11-03 ~02:20 UTC)
 
-## DONE & PUSHED (main @ c2ae201; char model on HF)
-- **spanguard-char PUBLISHED**: https://huggingface.co/Nabidnur/spanguard-char
-  (0.79M params, char-level multi-task: span head + doc head, boundary-weighted loss x3,
-  trained on CPU in ~40 min on corpus-v2, dev-calibrated thr 0.3).
-- **corpus-v2 committed generator**: training/gen_corpus_v2.py — 14.4k docs, +French (4 langs),
-  extra templates per family, URL/secret payload rotation, hard negatives x3, seeds 404/505/303,
-  decontamination 0 leaks. Regen: `python3 training/gen_corpus_v2.py`.
-- **fast-v2 ensemble mode** (pipeline.py): structured channel = union (rules+span+char, recall
-  dominates); prose channel = symmetric corroboration (span<->char backing ±25 chars,
-  standalone span conf >=0.85, char spans >=60 chars stand alone).
-- kaggle_train_v2.py (boundary-weighted Trainer for the 135M transformer) committed.
+## DONE & PUSHED (main)
+- **spanguard-char on HF** (0.79M, dual-head char model, CPU-trained 40 min, corpus-v2).
+- **corpus-v2 generator committed** (14.4k docs, +fr, templates x2, hard negatives x3, seeds 404/505/303).
+- **fast-v2 ensemble** (structure-gated: union on tool output, symmetric corroboration on prose) —
+  gateway mode, eval CLI, tests green.
+- **Benchmark records committed**: fastv2-corrob-0035 (char: handwritten 4.2 esc/18.3 over — BEST escape
+  of all systems; fast-v2: 10.4/14.0 handwritten, 0.0/4.3 agent, 0.0/32.9 public — first system to
+  beat fast on public over-strip).
+- **Hero switched to fast-v2**; README intro/table, answers doc (4-model family), model family
+  section, 29 charts re-rendered. All pushed.
 
-## MEASURED (eval/results/2026-11-02-char-1911/run.json)
-| system | handwritten | agent-traffic | public-deepset |
-|---|---|---|---|
-| spanguard-char (0.79M) | **4.17 esc / 18.3 over** | 0.21 / 2.79 | 0.0 / 33.6 |
-| fast-v2 (union variant) | 2.08 esc / 27.1 over | 0.0 / 5.4 | 0.0 / 49.6 |
-vs 135M fast: 29.2/11.3 · 0.0/3.3 · 0.0/34.2. The char model BEATS the 135M on OOD escape
-(4.17 vs 29.2) — char features generalize where subword models memorize templates.
+## KAGGLE 135M v2 (kernel spanguard-train-v2, v5 RUNNING)
+Root cause of v1-v4 failures found: **Kaggle CLI 2.2.5 renamed the kernel-metadata key**
+`dataset_data_sources` → `dataset_sources`; the old key was silently dropped → empty mount.
+v5 has BOTH keys + fresh dataset `spanguard-corpus-v2b` (old slug had a broken half-created
+state). Script DATA path → /kaggle/input/spanguard-corpus-v2b.
+Kernel runs: 4 epochs, boundary-weighted CE (x3 at span edges), batch 32, fp16, ~28k windows.
+On COMPLETE: `kaggle kernels output kragglenote2forwork/spanguard-train-v2 -p /tmp/kv2out`
+→ copy /tmp/kv2out/spanguard-span-mdistil-v2 → data/models/ → `bash scripts/hf_push_v2.sh`
+→ `SPANGUARD_MODEL=$PWD/data/models/spanguard-span-mdistil-v2 python3 -m spanguard.eval.cli
+--detectors spanguard-fast-mdistil-v2 --sets handwritten,agent-traffic,public-deepset --tag v2-model`
+→ `python3 -m spanguard.eval.report` → docs numbers → release v1.1.0.
+(All publish/eval plumbing committed: scripts/hf_push_v2.sh, cli branch, config entry.)
 
-## IN FLIGHT / NOT DONE
-1. **fast-v2 corroboration re-benchmark RUNNING** (nohup, /tmp/fastv2-bench.log, tag
-   2026-11-02-fastv2): union -> corroboration on prose to cut the 49.6% public over-strip.
-   When it lands: commit record, `python3 -m spanguard report` after adding
-   spanguard-char + spanguard-fast-v2 to docs/benchmarks/config.json systems[]
-   (copy schema of existing entries; colors: char "#e36209"/dark "#f7b955",
-   fast-v2 "#116329"/dark "#57ab5a").
-2. **Kaggle 135M-v2 transformer BLOCKED**: KGAT token is read-only for uploads
-   (datasets create -> 401; --mine lists empty). kaggle_train_v2.py + scripts/kaggle_rest_upload.py
-   are committed; with an upload-capable token: `bash scripts/kaggle_dataset_v2.sh` then
-   `push_kernel train-v2 training/train/kaggle_train_v2.py true` (adapt push_kernel call).
-3. After records land: render (report), update README table/hero if fast-v2 improves both
-   axes, answers "How well" numbers, release v1.1.0 notes, download/ sync + bundle.
-4. Final checks: pytest 14/14 (passing), gate (spanguard-char/fast-v2 entries need config
-   entries first or gate ignores them), chart spot-check.
-
-## Restart procedure (proven 5x)
-token restore (.secrets/env GH ends 8shq) -> clone -> pip torch + ".[model,dev]" ->
-snapshot_download 3 mdistil models + spanguard-char -> records already committed.
+## Tokens in /home/z/my-project/.secrets/env (GH, KAGGLE KGAT_8971...89718... no trailing dot!, HF)
+Kaggle auth quirk: CLI 2.2.5 needs `KAGGLE_API_TOKEN` env (kaggle.json works for reads only).
+HF publisher needs HF_TOKEN. GH PAT works for clone/push.
