@@ -109,6 +109,15 @@
       "hero": true
     },
     {
+      "tag": "spanguard-fast-mdistil-v2",
+      "label": "spanguard fast (corpus-v2 model)",
+      "short": "SG fast-v2-model",
+      "color": "#8250df",
+      "color_dark": "#ab7df8",
+      "cost_usd_per_1m_docs": 0,
+      "required": false
+    },
+    {
       "tag": "spanguard-rules",
       "label": "spanguard rules-only",
       "short": "SG rules",

@@ -138,6 +138,13 @@ def run_eval(systems: list[str], sets: list[str], tag: str | None = None, limit:
             except Exception as exc:  # noqa: BLE001
                 print(f"skip spanguard-fast-v2: {exc}")
                 continue
+        elif sysname == "spanguard-fast-mdistil-v2":
+            # same fast pipeline; SPANGUARD_MODEL must point at the v2 model dir
+            try:
+                fn = guard_system("fast")
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spanguard-fast-mdistil-v2: {exc}")
+                continue
         elif sysname == "spanguard-char":
             try:
                 from ..detect.char_guard import char_guard_system  # noqa: PLC0415
