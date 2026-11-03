@@ -15,18 +15,21 @@ Artifacts land in data/models/<name>/ with a training_meta.json each.
 from __future__ import annotations
 
 import json
-import os
 import sys
 import time
 from pathlib import Path
 
 import torch
 from torch.utils.data import Dataset
-from transformers import (AutoModelForSequenceClassification,
-                          AutoModelForTokenClassification, AutoTokenizer,
-                          DataCollatorForTokenClassification,
-                          DataCollatorWithPadding, Adafactor, Trainer,
-                          TrainingArguments)
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoModelForTokenClassification,
+    AutoTokenizer,
+    DataCollatorForTokenClassification,
+    DataCollatorWithPadding,
+    Trainer,
+    TrainingArguments,
+)
 
 REPO = Path(__file__).resolve().parents[2]
 BASE = "distilbert-base-multilingual-cased"
@@ -188,7 +191,7 @@ def train_span():
 
 # ------------------------------------------------------------------ classifiers
 sys.path.insert(0, str(REPO / "training" / "train"))
-from toolcall_gen import gen_toolcall  # noqa: E402
+from toolcall_gen import gen_toolcall
 
 
 class ClfDataset(Dataset):
@@ -206,7 +209,6 @@ class ClfDataset(Dataset):
 
 
 def eval_binary_local(model, rows, tokenizer, max_len):
-    from transformers import DataCollatorWithPadding  # noqa: PLC0415
 
     lat = []
     tp = fp = fn = tn = 0

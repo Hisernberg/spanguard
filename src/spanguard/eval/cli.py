@@ -33,7 +33,7 @@ def load_set(name: str, limit: int | None = None) -> list[dict]:
         if not p.exists() and name == "agent-traffic":
             p = DATA / "test.jsonl"
         if p.exists():
-            docs += [json.loads(l) for l in open(p, encoding="utf-8")]
+            docs += [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
     if limit:
         docs = docs[:limit]
     return docs
@@ -73,7 +73,7 @@ def external_system(record: dict, tag: str):
 def llm_selfdetect_system(limit: int | None = None, concurrency: int = 4):
     """LLM self-detection baseline. Reads the precomputed verdicts sidecar when
     present (training/eval_llm_detect.py); falls back to live calls otherwise."""
-    from ..types import Finding, Result  # noqa: PLC0415
+    from ..types import Finding, Result
 
     sidecar = RESULTS / "llm-self-detect" / "verdicts.json"
     verdicts: dict = {}
@@ -93,7 +93,7 @@ def llm_selfdetect_system(limit: int | None = None, concurrency: int = 4):
         return fn
 
     sys.path.insert(0, str(REPO / "training"))
-    from label_teacher import label_doc, load_key, match_span  # noqa: PLC0415
+    from label_teacher import label_doc, load_key, match_span
 
     api_key = load_key()
     client = __import__("httpx").Client()
@@ -147,7 +147,7 @@ def run_eval(systems: list[str], sets: list[str], tag: str | None = None, limit:
                 continue
         elif sysname == "spanguard-char":
             try:
-                from ..detect.char_guard import char_guard_system  # noqa: PLC0415
+                from ..detect.char_guard import char_guard_system
 
                 fn = char_guard_system()
             except Exception as exc:  # noqa: BLE001

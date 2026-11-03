@@ -33,7 +33,7 @@ class AuditDetector:
         self.last_usage: dict = {}
 
     def audit(self, text: str, timeout: float = 60.0) -> dict:
-        import httpx  # noqa: PLC0415 - lazy
+        import httpx
 
         t0 = time.monotonic()
         resp = httpx.post(

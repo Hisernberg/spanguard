@@ -270,7 +270,7 @@ def chart_banner(dark=False) -> str:
     body += _rect(490, y - 16, 250, 26, "#161b22" if dark else "#f6f8fa", rx=6)
     body += _txt(500, y + 1, "clean data + [stripped] attack", 11, "#7ee787" if dark else "#1a7f37", mono=True)
     # shield glyph
-    body += f'<path d="M 880 40 q 30 12 60 0 v 44 q 0 34 -30 48 q -30 -14 -30 -48 z" fill="#238636" opacity="0.9"/>'
+    body += '<path d="M 880 40 q 30 12 60 0 v 44 q 0 34 -30 48 q -30 -14 -30 -48 z" fill="#238636" opacity="0.9"/>'
     body += _txt(910, 84, "✓", 26, "#ffffff", "middle", "700")
     return _svg(W, H, body, dark)
 
@@ -459,7 +459,7 @@ def render_all() -> None:
             if open_m in src and content:
                 import re as _re
                 src = _re.sub(_re.escape(open_m) + r".*?" + _re.escape(close_m),
-                              open_m + "\n" + content + "\n" + close_m, src, flags=_re.S)
+                              open_m + "\n" + content + "\n" + close_m, src, flags=_re.DOTALL)
                 changed = True
         if changed:
             readme.write_text(src, encoding="utf-8")

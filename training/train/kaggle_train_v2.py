@@ -9,10 +9,15 @@ import os
 import time
 
 import torch
-from torch import nn
-from transformers import (AutoModelForTokenClassification, AutoTokenizer, Trainer,
-                          TrainingArguments, DataCollatorForTokenClassification)
 from datasets import Dataset as HFDataset
+from torch import nn
+from transformers import (
+    AutoModelForTokenClassification,
+    AutoTokenizer,
+    DataCollatorForTokenClassification,
+    Trainer,
+    TrainingArguments,
+)
 
 MODEL_NAME = "distilbert-base-multilingual-cased"
 MAX_LEN = 384
@@ -44,8 +49,8 @@ def load(split):
             raise FileNotFoundError(f"{split}.jsonl not found under {DATA}; /kaggle/input: {listing}")
         print(f"[wait] dataset mount empty, retrying in 60s ({split})")
         time.sleep(60)
-    docs = [json.loads(l) for l in open(sorted(wanted)[0], encoding="utf-8")]
-    print(split, len(docs), "<-", sorted(wanted)[0])
+    docs = [json.loads(l) for l in open(min(wanted), encoding="utf-8")]
+    print(split, len(docs), "<-", min(wanted))
     return docs
 
 

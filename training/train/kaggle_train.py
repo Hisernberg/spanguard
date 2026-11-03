@@ -12,12 +12,15 @@ import json
 import os
 import time
 
-import numpy as np
 import torch
 from torch.utils.data import Dataset
-from transformers import (AutoModelForTokenClassification, AutoTokenizer,
-                          DataCollatorForTokenClassification, Trainer,
-                          TrainingArguments)
+from transformers import (
+    AutoModelForTokenClassification,
+    AutoTokenizer,
+    DataCollatorForTokenClassification,
+    Trainer,
+    TrainingArguments,
+)
 
 MODEL_NAME = "distilbert-base-multilingual-cased"
 MAX_LEN = 384
@@ -53,7 +56,7 @@ def load(split):
             path = p
             break
     else:
-        path = sorted(wanted)[0]
+        path = min(wanted)
     docs = [json.loads(l) for l in open(path, encoding="utf-8")]
     print(split, len(docs), "<-", path)
     return docs
@@ -85,7 +88,7 @@ def encode_doc(doc):
                 labels.append(LABEL2ID["O"])
                 prev_in = False
                 continue
-            starts_new = any(gs <= s < ge for gs, ge in spans) and not prev_in
+            any(gs <= s < ge for gs, ge in spans) and not prev_in
             # B if this token starts a gold span (or continues after a gap)
             if any(gs <= s < ge for gs, ge in spans) and (not prev_in or s == 0):
                 labels.append(LABEL2ID["B-INJ"])

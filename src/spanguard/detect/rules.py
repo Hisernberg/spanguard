@@ -9,6 +9,7 @@ only; no network access here.
 from __future__ import annotations
 
 import base64
+import binascii
 import re
 import unicodedata
 
@@ -85,7 +86,7 @@ def _b64_spans(text: str) -> list[Span]:
             pad = blob + "=" * (-len(blob) % 4)
             decoded = base64.b64decode(pad, validate=True).decode("utf-8", "ignore")
             hit = len(_WORD.findall(decoded)) >= 3 or bool(_B64_KEYWORDS.search(decoded))
-        except Exception:
+        except (ValueError, UnicodeDecodeError, binascii.Error):
             hit = False
         if hit:
             out.append(Span(m.start(), m.end(), "encoding", "rule:encoded-b64", confidence=0.95))
@@ -97,7 +98,7 @@ def _hex_spans(text: str) -> list[Span]:
     for m in _HEX.finditer(text):
         try:
             decoded = bytes.fromhex(m.group(0)).decode("utf-8", "ignore")
-        except Exception:
+        except ValueError:
             continue
         if len(_WORD.findall(decoded)) >= 3:
             out.append(Span(m.start(), m.end(), "encoding", "rule:encoded-hex", confidence=0.95))
@@ -148,9 +149,11 @@ def _homoglyph_spans(text: str) -> list[Span]:
     for m in re.finditer(r"[^\W\d_]+", text, re.UNICODE):
         w = m.group(0)
         scripts = {_script(c) for c in w} - {"?"}
-        if len(scripts) > 1 and _script(w[0]) in {"la", "?"}:
-            # Mixed Latin/Cyrillic/Greek word: classic impersonation trick.
-            if any(_script(c) in {"cy", "gr"} for c in w):
+        if (
+            len(scripts) > 1
+            and _script(w[0]) in {"la", "?"}
+            and any(_script(c) in {"cy", "gr"} for c in w)
+        ):
                 out.append(Span(m.start(), m.end(), "smuggle", "rule:homoglyph", confidence=0.85))
     return out
 

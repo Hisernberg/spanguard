@@ -20,8 +20,8 @@ class SpanModel:
     """Sliding-window BIO tagger over character offsets."""
 
     def __init__(self, model_id: str | None = None, device: str = "auto", max_chars: int = 12000):
-        import torch  # noqa: PLC0415 - optional dependency
-        from transformers import AutoModelForTokenClassification, AutoTokenizer  # noqa: PLC0415
+        import torch
+        from transformers import AutoModelForTokenClassification, AutoTokenizer
 
         self._torch = torch
         model_id = model_id or os.environ.get("SPANGUARD_MODEL", DEFAULT_MODEL_ID)
@@ -89,4 +89,4 @@ class SpanModel:
             end += 1
         while start > 0 and text[start - 1].isalnum():
             start -= 1
-        return Span(start, end, "override", "model", confidence=round(conf, 3))
+        return Span(start, end, "injection", "model", confidence=round(conf, 3))

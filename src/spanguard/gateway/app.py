@@ -17,12 +17,22 @@ from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 
 from ..config import Settings
 from ..detect.pipeline import Guard
+from ..detect.toolscan import scan_tool_defs
 from ..types import doc_sha256
 
-app = FastAPI(title="Spanguard", version="0.1.0")
+app = FastAPI(title="Spanguard", version="3.0.0")
 settings = Settings.from_env()
-guard = Guard(mode=settings.mode, model_id=settings.model_id, threshold=settings.threshold)
+guard = Guard(mode=settings.mode, model_id=settings.model_id, threshold=settings.threshold,
+              typed_markers=settings.typed_markers)
+_client = httpx.AsyncClient(timeout=300)
 _log: list[dict] = []
+
+
+def _auth_ok(request: Request) -> bool:
+    """Optional gateway auth: set SPANGUARD_API_TOKEN to require it on every route."""
+    if not settings.api_token:
+        return True
+    return request.headers.get("authorization") == f"Bearer {settings.api_token}"
 
 
 def _inspect_text(text: str) -> str:
@@ -59,24 +69,32 @@ def _clean_request(body: dict) -> tuple[dict, list[dict]]:
 
 
 def _clean_response(data: dict) -> dict:
-    """Inspect tool-role messages inside a non-streaming response (agent-side history)."""
+    """Inspect tool-role content inside a non-streaming response: both the OpenAI
+    shape (choices[*].message, role=tool for agent frameworks that echo history)
+    and the protocol variant carrying a messages array per choice."""
     try:
-        messages = data["choices"][0].get("messages")  # some agent protocols echo history
-    except (KeyError, IndexError, TypeError):
-        messages = None
-    if messages:
-        for msg in messages:
-            if msg.get("role") == "tool" and isinstance(msg.get("content"), str):
-                msg["content"] = _inspect_text(msg["content"])
+        choices = data.get("choices") or []
+    except AttributeError:
+        return data
+    for choice in choices:
+        msg = choice.get("message") if isinstance(choice, dict) else None
+        if isinstance(msg, dict) and msg.get("role") == "tool" and isinstance(msg.get("content"), str):
+            msg["content"] = _inspect_text(msg["content"])
+        for hist in (choice.get("messages") or []) if isinstance(choice, dict) else []:
+            if isinstance(hist, dict) and hist.get("role") == "tool" and isinstance(hist.get("content"), str):
+                hist["content"] = _inspect_text(hist["content"])
     return data
 
 
 @app.get("/healthz")
 def healthz():
+    # detectors() reports what ACTUALLY loaded; degraded says why anything is missing,
+    # so a rules-only fallback can never masquerade as a model deployment.
     return {
-        "status": "ok",
+        "status": "degraded" if guard.degraded else "ok",
         "mode": settings.mode,
         "detectors": guard.detectors(),
+        "degraded": guard.degraded,
         "model": settings.model_id or "default",
         "upstream": settings.upstream_url,
     }
@@ -86,29 +104,37 @@ def healthz():
 async def chat_completions(request: Request):
     if settings.api_token and request.headers.get("authorization") != f"Bearer {settings.api_token}":
         return JSONResponse({"error": {"message": "unauthorized"}}, status_code=401)
+    if not _auth_ok(request):
+        return JSONResponse({"error": {"message": "unauthorized"}}, status_code=401)
     body = await request.json()
     body, req_log = _clean_request(dict(body))
+    # idea C: tool definitions are an injection surface (MCPTox: 36.5% poisoning
+    # success). Scan them; flag rug-pulls against the operator's pin file.
+    tool_findings = scan_tool_defs(body, settings.tool_pin_file)
     stream = bool(body.get("stream"))
-    headers = {"Authorization": f"Api-Key {settings.upstream_api_key}", "Content-Type": "application/json"}
+    auth = (f"Bearer {settings.upstream_api_key}" if settings.upstream_auth_style == "bearer"
+            else f"Api-Key {settings.upstream_api_key}")
+    headers = {"Authorization": auth, "Content-Type": "application/json"}
     t0 = time.monotonic()
+    upstream = f"{settings.upstream_url}/chat/completions"
     try:
         if stream:
-            upstream = f"{settings.upstream_url}/chat/completions"
-
-            def gen():
-                with httpx.stream("POST", upstream, json=body, headers=headers, timeout=300) as r:
-                    for chunk in r.iter_text():
+            async def gen():
+                async with _client.stream("POST", upstream, json=body, headers=headers) as r:
+                    async for chunk in r.aiter_text():
                         yield chunk
 
             return StreamingResponse(gen(), media_type="text/event-stream")
 
-        r = httpx.post(
-            f"{settings.upstream_url}/chat/completions", json=body, headers=headers, timeout=300
-        )
+        r = await _client.post(upstream, json=body, headers=headers)
         data = r.json()
         data = _clean_response(data)
-        _log.append({"t": time.monotonic() - t0, "requests": req_log})
-        return JSONResponse(data, status_code=r.status_code)
+        _log.append({"t": round(time.monotonic() - t0, 3), "requests": req_log,
+                     "tool_findings": tool_findings})
+        resp = JSONResponse(data, status_code=r.status_code)
+        if tool_findings:
+            resp.headers["x-spanguard-tool-findings"] = json.dumps(tool_findings)
+        return resp
     except httpx.HTTPError as exc:
         return JSONResponse({"error": {"message": f"upstream error: {exc}"}}, status_code=502)
 
@@ -116,6 +142,8 @@ async def chat_completions(request: Request):
 @app.post("/guard")
 async def guard_text(request: Request):
     """Demo endpoint: guard one text, return cleaned text + findings as HTML-safe JSON."""
+    if not _auth_ok(request):
+        return JSONResponse({"error": {"message": "unauthorized"}}, status_code=401)
     payload = await request.json()
     text = str(payload.get("text", ""))[:20000]
     result = guard.guard(text)

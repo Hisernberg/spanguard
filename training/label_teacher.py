@@ -138,7 +138,7 @@ def main() -> None:
         rng = random.Random(args.seed)
         subset = rng.sample(docs, min(n, len(docs)))
         # keep family balance in the subset
-        by_hash = {d["id"]: d for d in docs}
+        {d["id"]: d for d in docs}
 
         def work(d):
             attacks, usage = label_doc(client, api_key, d["text"])

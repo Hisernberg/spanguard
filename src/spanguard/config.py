@@ -14,6 +14,9 @@ class Settings:
     upstream_url: str = "https://inference.baseten.co/v1"
     upstream_model: str = "meta-models/muse-spark-open-1026"
     upstream_api_key: str = ""            # BASETEN_API_KEY / META_API_KEY
+    upstream_auth_style: str = "bearer"   # bearer (OpenAI-style) | api-key (Baseten legacy)
+    typed_markers: bool = True            # [stripped:override] vs [stripped]
+    tool_pin_file: str = ""               # optional JSON {tool_name: sha256(desc)} for rug-pull detection
     inspect_system: bool = True           # also inspect the system prompt
     inspect_user: bool = True             # also inspect user messages
     passthrough_assistant: bool = True    # never rewrite assistant history
@@ -23,7 +26,7 @@ class Settings:
     extra: dict = field(default_factory=dict)
 
     @classmethod
-    def from_env(cls) -> "Settings":
+    def from_env(cls) -> Settings:
         return cls(
             mode=os.environ.get("SPANGUARD_MODE", "fast"),
             model_id=os.environ.get("SPANGUARD_MODEL") or None,
@@ -31,6 +34,9 @@ class Settings:
             upstream_url=os.environ.get("SPANGUARD_UPSTREAM_URL", "https://inference.baseten.co/v1"),
             upstream_model=os.environ.get("SPANGUARD_UPSTREAM_MODEL", "meta-models/muse-spark-open-1026"),
             upstream_api_key=os.environ.get("BASETEN_API_KEY") or os.environ.get("META_API_KEY", ""),
+            upstream_auth_style=os.environ.get("SPANGUARD_UPSTREAM_AUTH", "bearer"),
+            typed_markers=os.environ.get("SPANGUARD_TYPED_MARKERS", "1") == "1",
+            tool_pin_file=os.environ.get("SPANGUARD_TOOL_PIN_FILE", ""),
             inspect_system=os.environ.get("SPANGUARD_INSPECT_SYSTEM", "1") == "1",
             inspect_user=os.environ.get("SPANGUARD_INSPECT_USER", "1") == "1",
             host=os.environ.get("SPANGUARD_HOST", "127.0.0.1"),

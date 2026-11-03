@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-import gen_corpus as g  # noqa: E402
+import gen_corpus as g
 
 # ---------------------------------------------------------------- french names/places
 g.NAMES["fr"] = ["Camille Roy", "Hugo Perrin", "Léa Moreau", "Théo Lambert", "Manon Girard",
@@ -287,8 +287,7 @@ def main() -> None:
               "test": gen_split_v2(303, args.test, 0.55, 0.12)}
     for name, docs in splits.items():
         with open(out / f"{name}.jsonl", "w", encoding="utf-8") as fh:
-            for d in docs:
-                fh.write(json.dumps(d, ensure_ascii=False) + "\n")
+            fh.writelines(json.dumps(d, ensure_ascii=False) + "\n" for d in docs)
         fams: dict[str, int] = {}
         langs: dict[str, int] = {}
         for d in docs:

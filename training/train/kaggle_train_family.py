@@ -13,20 +13,26 @@ deterministic generator committed in this file. Fictional data only.
 """
 
 import json
-import statistics
 import os
-import random
+import statistics
 import time
 
 import torch
 from torch.utils.data import Dataset
-from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
-                          DataCollatorWithPadding, Trainer, TrainingArguments)
+from transformers import (
+    AutoModelForSequenceClassification,
+    AutoTokenizer,
+    DataCollatorWithPadding,
+    Trainer,
+    TrainingArguments,
+)
 
 BASE = "distilbert-base-multilingual-cased"
 import sys as _sys
+
 _sys.path.insert(0, str(__import__("pathlib").Path(__file__).resolve().parent))
-from toolcall_gen import gen_toolcall  # noqa: E402
+from toolcall_gen import gen_toolcall
+
 DATA = "/kaggle/input/spanguard-corpus-v2"
 WD = "/kaggle/working"
 t0 = time.time()

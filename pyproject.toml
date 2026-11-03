@@ -38,6 +38,13 @@ packages = ["src/spanguard"]
 line-length = 100
 target-version = "py310"
 
+[tool.ruff.lint.per-file-ignores]
+# Kaggle kernel scripts: notebook-style linear I/O with paths/log lines; context
+# managers buy nothing there and would churn committed kernel code.
+"training/**/*.py" = ["SIM115"]
+"eval/fixtures/*.py" = ["SIM115"]
+"src/spanguard/eval/cli.py" = ["SIM115"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

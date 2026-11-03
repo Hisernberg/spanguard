@@ -7,9 +7,10 @@ Outputs eval/results/<date>-baselines/run.json (run-record schema).
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import json
+import operator
 import statistics
-import sys
 import time
 from pathlib import Path
 
@@ -38,7 +39,7 @@ def attack_index(id2label) -> int:
 def load_sets() -> dict[str, list[dict]]:
     fixtures = REPO / "eval" / "fixtures"
     sets = {
-        "handwritten": sum([[json.loads(l) for l in open(fixtures / f"handwritten-{l}.jsonl", encoding="utf-8")]
+        "handwritten": functools.reduce(operator.iadd, [[json.loads(l) for l in open(fixtures / f"handwritten-{l}.jsonl", encoding="utf-8")]
                             for l in ("en", "de", "hu")], []),
         "agent-traffic": [json.loads(l) for l in open(fixtures / "agent-traffic.jsonl", encoding="utf-8")][:900],
         "public-deepset": [json.loads(l) for l in open(fixtures / "public-deepset.jsonl", encoding="utf-8")],

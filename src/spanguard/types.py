@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 
 
 @dataclass
@@ -18,10 +18,10 @@ class Span:
     rule: str = ""     # rule name when source starts with "rule"
     confidence: float = 1.0
 
-    def clipped(self, n: int) -> "Span":
+    def clipped(self, n: int) -> Span:
         return Span(max(0, self.start), min(n, self.end), self.kind, self.source, self.rule, self.confidence)
 
-    def overlaps(self, other: "Span") -> bool:
+    def overlaps(self, other: Span) -> bool:
         return self.start < other.end and other.start < self.end
 
     def as_dict(self) -> dict:

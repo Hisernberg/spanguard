@@ -5,7 +5,6 @@ what surgical stripping needs. Dev-set threshold sweep produces calibration.json
 Usage: python3 training/train_char.py [--train-limit N] [--epochs E]"""
 import argparse
 import json
-import statistics
 import sys
 import time
 from pathlib import Path
@@ -14,7 +13,7 @@ import torch
 import torch.nn.functional as F
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-from spanguard.detect.char_model import CharGuardNet, build_vocab, encode  # noqa: E402
+from spanguard.detect.char_model import CharGuardNet, build_vocab, encode
 
 REPO = Path(__file__).parent.parent
 BOUNDARY_W = 3.0
@@ -129,7 +128,7 @@ def main() -> None:
     with torch.no_grad():
         for thr in [0.3, 0.4, 0.5, 0.6, 0.7]:
             tp = fp = leak = planted = 0
-            fb = benign_docs = stripped_benign = 0
+            benign_docs = stripped_benign = 0
             doc_tp = doc_fp = doc_fn = 0
             for d in dev:
                 text = d["text"][:4096]

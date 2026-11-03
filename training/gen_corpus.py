@@ -341,8 +341,7 @@ def main() -> None:
               "test": gen_split(303, args.test, 0.55, 0.12)}
     for name, docs in splits.items():
         with open(out / f"{name}.jsonl", "w", encoding="utf-8") as fh:
-            for d in docs:
-                fh.write(json.dumps(d, ensure_ascii=False) + "\n")
+            fh.writelines(json.dumps(d, ensure_ascii=False) + "\n" for d in docs)
         fams: dict[str, int] = {}
         for d in docs:
             if d["attack"]:

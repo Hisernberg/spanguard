@@ -33,7 +33,7 @@ def strip_all_guard(doc):
 
 
 def test_perfect_guard_zero_escape():
-    docs = [json.loads(l) for l in open(FIXTURES / "handwritten-en.jsonl", encoding="utf-8")]
+    docs = [json.loads(l) for l in (FIXTURES / "handwritten-en.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
     m = score_documents(docs, perfect_guard)
     assert m["escape_rate"] == 0.0
     assert m["overstrip_rate"] == 0.0
@@ -42,7 +42,7 @@ def test_perfect_guard_zero_escape():
 
 
 def test_blind_guard_leaks_everything():
-    docs = [json.loads(l) for l in open(FIXTURES / "handwritten-en.jsonl", encoding="utf-8")]
+    docs = [json.loads(l) for l in (FIXTURES / "handwritten-en.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
     m = score_documents(docs, blind_guard)
     assert m["escape_rate"] == 1.0
     assert m["doc_recall"] == 0.0
@@ -51,7 +51,7 @@ def test_blind_guard_leaks_everything():
 
 def test_paranoid_guard_zero_escape_but_destroys_data():
     """A guard that nukes every doc: no escapes, but all benign data is lost."""
-    docs = [json.loads(l) for l in open(FIXTURES / "handwritten-en.jsonl", encoding="utf-8")]
+    docs = [json.loads(l) for l in (FIXTURES / "handwritten-en.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
 
     def paranoid_guard(doc):
         f = Finding(start=0, end=len(doc["text"]), length=len(doc["text"]), kind="all",
@@ -73,7 +73,7 @@ def test_binary_attack_docs_count_in_doc_detection():
 
 
 def test_agent_traffic_fixture_loads():
-    docs = [json.loads(l) for l in open(FIXTURES / "agent-traffic.jsonl", encoding="utf-8")]
+    docs = [json.loads(l) for l in (FIXTURES / "agent-traffic.jsonl").read_text(encoding="utf-8").splitlines() if l.strip()]
     assert len(docs) >= 800
     assert any(d["attack"] for d in docs)
     assert any(not d["attack"] for d in docs)
