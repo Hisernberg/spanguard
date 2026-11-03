@@ -24,6 +24,7 @@ SET_FILES = {
     "agent-traffic": ["agent-traffic.jsonl"],
     "public-deepset": ["public-deepset.jsonl"],
     "extended-attacks": ["extended-attacks.jsonl"],
+    "extended-v4": ["extended-v4.jsonl"],
 }
 
 
@@ -151,6 +152,12 @@ def run_eval(systems: list[str], sets: list[str], tag: str | None = None, limit:
                 fn = guard_system("fast-v3")
             except Exception as exc:  # noqa: BLE001
                 print(f"skip spanguard-fast-v3: {exc}")
+                continue
+        elif sysname == "spanguard-fast-v4":
+            try:
+                fn = guard_system("fast-v4")
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spanguard-fast-v4: {exc}")
                 continue
         elif sysname == "spanguard-char-v3":
             try:

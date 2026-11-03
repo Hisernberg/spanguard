@@ -19,6 +19,8 @@ _EXT_HINTS = re.compile(
     r"Whiteboard section kept verbatim|!\[[^\]]*\]\(https?://|Cleanup reminder filed)",
 )
 _BENGALI = re.compile(r"[\u0980-\u09FF]")
+_ARABIC = re.compile(r"[\u0600-\u06FF]")
+_JAPANESE = re.compile(r"[\u3040-\u30FF\u4E00-\u9FFF]")
 
 
 def is_extended_domain(text: str) -> bool:
@@ -68,3 +70,80 @@ def router_stats() -> dict:
 
 
 _ = json  # keep import for downstream record helpers
+
+
+# ------------------------------------------------------------------ v4: three-level expert routing
+_V4_CARRIER = re.compile(
+    r"(?:^|\n)\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}\b"          # log lines
+    r"|Source: .+\[chunk \d+/\d+\]"                                   # rag chunk header
+    r"|(^|\n)(?:def |class |import |from )|# NOTE to AI" )               # source code
+
+
+def route_v4(text: str) -> str:
+    """Return which char expert should read this text: 'v4' (log/code/rag
+    carriers, Arabic, Japanese), 'v3' (v3 extended carriers, Bangla) or 'v2'
+    (everything else). Order matters: script tests first (a Bangla doc inside
+    a log carrier is still bn), then v4 carriers, then v3 carriers."""
+    if _BENGALI.search(text):
+        return "v3"
+    if _ARABIC.search(text) or _JAPANESE.search(text):
+        return "v4"
+    if _V4_CARRIER.search(text):
+        return "v4"
+    if is_extended_domain(text):
+        return "v3"
+    return "v2"
+
+
+def routed_char_spans_v4(text: str, threshold: float | None = None):
+    """char_spans through the three-level router. Model dirs from env:
+    SPANGUARD_CHAR_MODEL (v2), SPANGUARD_CHAR_MODEL_V3, SPANGUARD_CHAR_MODEL_V4."""
+    import os
+
+    from .char_guard import char_spans
+
+    dirs = {"v2": os.environ.get("SPANGUARD_CHAR_MODEL"),
+            "v3": os.environ.get("SPANGUARD_CHAR_MODEL_V3"),
+            "v4": os.environ.get("SPANGUARD_CHAR_MODEL_V4")}
+    level = route_v4(text)
+    model = dirs[level] or dirs["v2"]
+    spans, doc_p = char_spans(text, dir_path=model, threshold=threshold)
+    return spans, doc_p, f"spanguard-char-router:{level}"
+
+
+# ------------------------------------------------------------------ v4: three-level expert routing
+_V4_CARRIER = re.compile(
+    r"(?:^|\n)\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}\b"   # log timestamp lines
+    r"|Source: .+\[chunk \d+/\d+\]"                        # rag-chunk header
+    r"|(^|\n)(?:def |class |import |from )|# NOTE to AI")  # python-ish source
+
+
+def route_v4(text: str) -> str:
+    """Which char expert should read this text: 'v4' (log/code/rag carriers,
+    Arabic, Japanese), 'v3' (v3 extended carriers, Bangla) or 'v2' (the rest).
+    Script tests come first — a Bangla doc inside a log carrier is still bn."""
+    if _BENGALI.search(text):
+        return "v3"
+    if _ARABIC.search(text) or _JAPANESE.search(text):
+        return "v4"
+    if _V4_CARRIER.search(text):
+        return "v4"
+    if is_extended_domain(text):
+        return "v3"
+    return "v2"
+
+
+def routed_char_spans_v4(text: str, threshold: float | None = None):
+    """char_spans through the three-level router. Model dirs from env:
+    SPANGUARD_CHAR_MODEL (v2), SPANGUARD_CHAR_MODEL_V3, SPANGUARD_CHAR_MODEL_V4."""
+    import os
+
+    from .char_guard import char_spans
+
+    dirs = {"v2": os.environ.get("SPANGUARD_CHAR_MODEL"),
+            "v3": os.environ.get("SPANGUARD_CHAR_MODEL_V3"),
+            "v4": os.environ.get("SPANGUARD_CHAR_MODEL_V4")}
+    level = route_v4(text)
+    model = dirs[level] or dirs["v2"]
+    spans, doc_p = char_spans(text, dir_path=model, threshold=threshold)
+    return spans, doc_p, f"spanguard-char-router:{level}"

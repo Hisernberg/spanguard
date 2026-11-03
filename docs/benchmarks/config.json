@@ -8,7 +8,8 @@
     "handwritten": "Hand-written attacks \u00b7 62 docs (en+de+hu)",
     "agent-traffic": "Agent traffic \u00b7 900 docs (synthetic tool output)",
     "public-deepset": "Public prompts (benign-only over-strip probe) \u00b7 452 docs \u00b7 escape column n/a \u2014 the set plants no attacks",
-    "extended-attacks": "Extended attacks \u00b7 90 docs (MCP poisoning, skill files, buried multi-hop, md-image exfil, polite social-eng)"
+    "extended-attacks": "Extended attacks \u00b7 90 docs (MCP poisoning, skill files, buried multi-hop, md-image exfil, polite social-eng)",
+    "extended-v4": "Extended attacks v4 \u00b7 96 docs (log-poison, code-comment, rag-chunk carriers + ar/ja in-domain)"
   },
   "axes": {
     "handwritten": {
@@ -79,6 +80,15 @@
     }
   ],
   "systems": [
+    {
+      "tag": "spanguard-fast-v4",
+      "label": "spanguard fast-v4 (rules + span-v2 + 3-level char router)",
+      "short": "SG fast-v4",
+      "color": "#1d4ed8",
+      "color_dark": "#5b8af5",
+      "cost_usd_per_1m_docs": 0,
+      "required": true
+    },
     {
       "tag": "spanguard-fast-v3",
       "label": "spanguard fast-v3 (rules + span-v2 + char router)",
