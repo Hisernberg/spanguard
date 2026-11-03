@@ -9,10 +9,9 @@
 [![Demo video](https://img.shields.io/badge/demo%20video-3--min-blue)](https://github.com/Hisernberg/spanguard#demo)
 
 <!-- intro:start -->
-- **What it does.** An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; a 135M-parameter multilingual span model plus validated rules find prompt-injection text inside the data and replace each span with [stripped], while orders, totals, names and JSON structure survive untouched.
-- **How well.** On the 62-document hand-written multilingual attack set, spanguard fast (rules + SLM) escapes 29.2% of planted attack payloads at 11.3% benign data loss (doc F1 81%). The strongest open binary guard on the same set (horizon injection-guard base, strip-all semantics) reaches 6.2% escape only by over-stripping 59.0% of benign characters — the agent loses most of what it was reading; protectai deberta-v3 is worse than spanguard on BOTH axes (35.4% escape, 71.8% over-strip); a 0.5B LLM asked to flag its own injections misses 91.7%
-- **On agent traffic.** 900 synthetic tool-output documents: escape 0.0%, over-strip 3.3%, doc F1 95%.
-- **How fast.** p50 ≈ tens of ms per document with the 135M span model on local CPU (2 threads, recovery build); rules-only ≈0.2 ms; no per-document API cost in any default mode
+- **What it does.** An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; validated rules, a 135M-parameter multilingual span model and a 0.79M char-level multi-task model find prompt-injection text inside the data and replace each span with [stripped], while orders, totals, names and JSON structure survive untouched. The fast-v2 ensemble gates the detectors by document structure: high-recall union on tool output, corroboration on prose.
+- **How well.** On the 62-document hand-written multilingual attack set, spanguard fast-v2 (ensemble) escapes 10.4% of planted attack payloads at 14.0% benign data loss (doc F1 89%). The strongest open binary guard on the same set (horizon injection-guard base, strip-all semantics) reaches 6.2% escape only by over-stripping 59.0% of benign characters — the agent loses most of what it was reading; protectai deberta-v3 is worse than spanguard on BOTH axes (35.4% escape, 71.8% over-strip); a 0.5B LLM asked to flag its own injections misses 91.7% of attacks. spanguard's char-only tier trades a further escape cut (4.2%) for 18.3% over-strip when security outweighs data fidelity.
+- **On agent traffic.** 900 synthetic tool-output documents: escape 0.0%, over-strip 4.3%, doc F1 93%.
 - **Measured in the open.** Committed run records per system and set (eval/results/), fictional data only, an external public set for generalization, per-attack-family heatmaps, CPU latency measured where each system ran, and a cost ledger. Rerun everything with `make eval` + the Kaggle kernels in training/train/.
 <!-- intro:end -->
 
@@ -118,11 +117,11 @@ three are distilled from the same fictional corpus and run on CPU.
 ## Results
 
 <!-- results:start -->
-| Set | spanguard fast (rules + SLM) | spanguard rules-only | protectai deberta-v3-injection-v2 | Qwen2.5-0.5B self-detect (local CPU) | spanguard audit (rules+SLM+LLM) | spanguard docguard (doc classifier) | spanguard toolguard (tool-call args) | horizon injection-guard small (binary) | horizon injection-guard base (binary) |
-|---|---|---|---|---|---|---|---|---|---|
-| Hand-written attacks · 62 docs (en+de+hu) | 29.2% · 11.3% | 72.9% · 7.5% | 35.4% · 71.8% | 91.7% · 13.1% | — | — | — | 8.3% · 37.7% | 6.2% · 59.0% |
-| Agent traffic · 900 docs (synthetic tool output) | 0.0% · 3.3% | 13.4% · 3.3% | 43.6% · 48.0% | 97.5% · 5.1% | — | — | — | 12.5% · 6.3% | 15.2% · 13.1% |
-| Public prompts · 452 docs (deepset, external) | 0.0% · 34.2% | 0.0% · 0.1% | 0.0% · 1.2% | 0.0% · 5.0% | — | — | — | 0.0% · 0.0% | 0.0% · 0.0% |
+| Set | spanguard fast (rules + SLM) | spanguard char (0.79M) | spanguard fast-v2 (ensemble) | spanguard rules-only | protectai deberta-v3-injection-v2 | Qwen2.5-0.5B self-detect (local CPU) | spanguard audit (rules+SLM+LLM) | spanguard docguard (doc classifier) | spanguard toolguard (tool-call args) | horizon injection-guard small (binary) | horizon injection-guard base (binary) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Hand-written attacks · 62 docs (en+de+hu) | 29.2% · 11.3% | 4.2% · 18.3% | 10.4% · 14.0% | 72.9% · 7.5% | 35.4% · 71.8% | 91.7% · 13.1% | — | — | — | 8.3% · 37.7% | 6.2% · 59.0% |
+| Agent traffic · 900 docs (synthetic tool output) | 0.0% · 3.3% | 0.2% · 2.8% | 0.0% · 4.3% | 13.4% · 3.3% | 43.6% · 48.0% | 97.5% · 5.1% | — | — | — | 12.5% · 6.3% | 15.2% · 13.1% |
+| Public prompts · 452 docs (deepset, external) | 0.0% · 34.2% | 0.0% · 33.6% | 0.0% · 32.9% | 0.0% · 0.1% | 0.0% · 1.2% | 0.0% · 5.0% | — | — | — | 0.0% · 0.0% | 0.0% · 0.0% |
 
 Escape · over-stripping, lower is better on both. Set sizes: handwritten 62 (en/de/hu, hand-written attacks), agent-traffic 900 (synthetic tool output), public-deepset 452 (external user-prompt set, binary).
 <!-- results:end -->
