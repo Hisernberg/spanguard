@@ -61,6 +61,13 @@ Cells are **escape % · over-strip %**. Four readings the table gives away for f
 - Binary baselines are scored with strip-all semantics: one bit → the whole document
   is lost. That is what a 1-bit classifier can actually do operationally.
 
+**Domain expansion (v3).** Corpus v3 + char-v3 extend coverage to the 2026 surface
+(MCP tool poisoning, skill files, buried multi-hop, markdown-image exfil, polite
+social engineering, +Bangla): on those five NEW families char-v3 scores 0.4% escape
+with span F1 0.996 where char-v2 scored 11.6% / 0.467. The trade is published too:
+char-v3 regresses on the original hand-written OOD set (4.2% → 12.5%). Both models
+ship; per-domain routing is roadmap.
+
 ## 4. The model family (4 models; span models on free Kaggle GPU, the rest on local CPU)
 
 | Model | Task | Result | HF |

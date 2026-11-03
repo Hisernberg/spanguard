@@ -109,6 +109,15 @@
       "hero": true
     },
     {
+      "tag": "spanguard-char-v3",
+      "label": "spanguard char-v3 (extended domain)",
+      "short": "SG char-v3",
+      "color": "#bf8700",
+      "color_dark": "#e2b714",
+      "cost_usd_per_1m_docs": 0,
+      "required": false
+    },
+    {
       "tag": "spanguard-fast-mdistil-v2",
       "label": "spanguard fast (corpus-v2 model)",
       "short": "SG fast-v2-model",

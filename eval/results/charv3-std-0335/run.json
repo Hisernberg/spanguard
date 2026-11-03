@@ -1,0 +1,168 @@
+{
+ "generated_at": "2026-11-03T03:35:49+00:00",
+ "environment": {
+  "python": "3.12.16",
+  "platform": "Linux-5.10.134-013.15.kangaroo.al8.x86_64-x86_64-with-glibc2.41"
+ },
+ "systems": {
+  "spanguard-char-v3": {
+   "sets": {
+    "handwritten": {
+     "docs": 62,
+     "planted": 48,
+     "escape_rate": 0.125,
+     "overstrip_rate": 0.2166,
+     "doc_precision": 0.8519,
+     "doc_recall": 0.9583,
+     "doc_f1": 0.902,
+     "span_precision": 0.1191,
+     "span_recall": 0.6875,
+     "span_f1": 0.2031,
+     "latency_ms_p50": null,
+     "latency_ms_p95": null,
+     "per_language": {
+      "de": {
+       "escape_rate": 0.1538,
+       "docs": 17
+      },
+      "en": {
+       "escape_rate": 0.0833,
+       "docs": 31
+      },
+      "hu": {
+       "escape_rate": 0.1818,
+       "docs": 14
+      }
+     },
+     "per_family": {
+      "encoding": {
+       "escape_rate": 0.0,
+       "planted": 2
+      },
+      "exfil-secret": {
+       "escape_rate": 0.0,
+       "planted": 7
+      },
+      "exfil-url": {
+       "escape_rate": 0.1429,
+       "planted": 7
+      },
+      "forgery": {
+       "escape_rate": 0.1,
+       "planted": 10
+      },
+      "impersonation": {
+       "escape_rate": 0.1667,
+       "planted": 6
+      },
+      "narrative": {
+       "escape_rate": 0.1429,
+       "planted": 7
+      },
+      "override": {
+       "escape_rate": 0.4,
+       "planted": 5
+      },
+      "smuggle": {
+       "escape_rate": 0.0,
+       "planted": 4
+      }
+     }
+    },
+    "agent-traffic": {
+     "docs": 900,
+     "planted": 479,
+     "escape_rate": 0.0021,
+     "overstrip_rate": 0.0304,
+     "doc_precision": 0.9002,
+     "doc_recall": 0.9979,
+     "doc_f1": 0.9465,
+     "span_precision": 0.6051,
+     "span_recall": 0.9916,
+     "span_f1": 0.7516,
+     "latency_ms_p50": null,
+     "latency_ms_p95": null,
+     "per_language": {
+      "de": {
+       "escape_rate": 0.0101,
+       "docs": 187
+      },
+      "en": {
+       "escape_rate": 0.0,
+       "docs": 546
+      },
+      "hu": {
+       "escape_rate": 0.0,
+       "docs": 167
+      }
+     },
+     "per_family": {
+      "encoding-b64": {
+       "escape_rate": 0.0,
+       "planted": 43
+      },
+      "encoding-hex": {
+       "escape_rate": 0.0233,
+       "planted": 43
+      },
+      "exfil-secret": {
+       "escape_rate": 0.0,
+       "planted": 46
+      },
+      "exfil-url": {
+       "escape_rate": 0.0,
+       "planted": 46
+      },
+      "forgery": {
+       "escape_rate": 0.0,
+       "planted": 47
+      },
+      "impersonation": {
+       "escape_rate": 0.0,
+       "planted": 50
+      },
+      "narrative": {
+       "escape_rate": 0.0,
+       "planted": 44
+      },
+      "override": {
+       "escape_rate": 0.0,
+       "planted": 50
+      },
+      "smuggle-homoglyph": {
+       "escape_rate": 0.0,
+       "planted": 47
+      },
+      "smuggle-unicode": {
+       "escape_rate": 0.0,
+       "planted": 63
+      }
+     }
+    },
+    "public-deepset": {
+     "docs": 452,
+     "planted": 0,
+     "escape_rate": 0.0,
+     "overstrip_rate": 0.6118,
+     "doc_precision": 0.5065,
+     "doc_recall": 0.9557,
+     "doc_f1": 0.6621,
+     "span_precision": 0.0,
+     "span_recall": 0.0,
+     "span_f1": 0.0,
+     "latency_ms_p50": null,
+     "latency_ms_p95": null,
+     "per_language": {
+      "en": {
+       "escape_rate": 0.0,
+       "docs": 452
+      }
+     },
+     "per_family": {}
+    }
+   },
+   "wallclock_s": 32
+  }
+ },
+ "note": "run with SPANGUARD_CHAR_MODEL=spanguard-char-v3; renamed to spanguard-char-v3 so the char-v2 record stays. Honest result: extended-domain training buys 0.4% escape on the NEW families but regresses on the ORIGINAL hand-written OOD set (4.2% -> 12.5%) and public over-strip (33.6% -> 61.2%) \u2014 domain expansion trades old-OOD sharpness for new-domain coverage. Both models ship; the gateway picks per deployment profile."
+}

@@ -126,11 +126,11 @@ committed Kaggle kernel (`training/train/kaggle_train_v2.py`).
 ## Results
 
 <!-- results:start -->
-| Set | spanguard fast (rules + SLM) | spanguard char (0.79M) | spanguard fast-v2 (ensemble) | spanguard fast (corpus-v2 model) | spanguard rules-only | protectai deberta-v3-injection-v2 | Qwen2.5-0.5B self-detect (local CPU) | spanguard audit (rules+SLM+LLM) | spanguard docguard (doc classifier) | spanguard toolguard (tool-call args) | horizon injection-guard small (binary) | horizon injection-guard base (binary) |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Hand-written attacks · 62 docs (en+de+hu) | 29.2% · 11.3% | 4.2% · 18.3% | 10.4% · 14.0% | 33.3% · 6.9% | 72.9% · 7.5% | 35.4% · 71.8% | 91.7% · 13.1% | — | — | — | 8.3% · 37.7% | 6.2% · 59.0% |
-| Agent traffic · 900 docs (synthetic tool output) | 0.0% · 3.3% | 0.2% · 2.8% | 0.0% · 4.3% | 0.0% · 4.0% | 13.4% · 3.3% | 43.6% · 48.0% | 97.5% · 5.1% | — | — | — | 12.5% · 6.3% | 15.2% · 13.1% |
-| Public prompts · 452 docs (deepset, external) | 0.0% · 34.2% | 0.0% · 33.6% | 0.0% · 32.9% | 0.0% · 18.1% | 0.0% · 0.1% | 0.0% · 1.2% | 0.0% · 5.0% | — | — | — | 0.0% · 0.0% | 0.0% · 0.0% |
+| Set | spanguard fast (rules + SLM) | spanguard char (0.79M) | spanguard fast-v2 (ensemble) | spanguard char-v3 (extended domain) | spanguard fast (corpus-v2 model) | spanguard rules-only | protectai deberta-v3-injection-v2 | Qwen2.5-0.5B self-detect (local CPU) | spanguard audit (rules+SLM+LLM) | spanguard docguard (doc classifier) | spanguard toolguard (tool-call args) | horizon injection-guard small (binary) | horizon injection-guard base (binary) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Hand-written attacks · 62 docs (en+de+hu) | 29.2% · 11.3% | 4.2% · 18.3% | 10.4% · 14.0% | 12.5% · 21.7% | 33.3% · 6.9% | 72.9% · 7.5% | 35.4% · 71.8% | 91.7% · 13.1% | — | — | — | 8.3% · 37.7% | 6.2% · 59.0% |
+| Agent traffic · 900 docs (synthetic tool output) | 0.0% · 3.3% | 0.2% · 2.8% | 0.0% · 4.3% | 0.2% · 3.0% | 0.0% · 4.0% | 13.4% · 3.3% | 43.6% · 48.0% | 97.5% · 5.1% | — | — | — | 12.5% · 6.3% | 15.2% · 13.1% |
+| Public prompts (benign-only over-strip probe) · 452 docs · escape column n/a — the set plants no attacks | 0.0% · 34.2% | 0.0% · 33.6% | 0.0% · 32.9% | 0.0% · 61.2% | 0.0% · 18.1% | 0.0% · 0.1% | 0.0% · 1.2% | 0.0% · 5.0% | — | — | — | 0.0% · 0.0% | 0.0% · 0.0% |
 
 Escape · over-stripping, lower is better on both. Set sizes: handwritten 62 (en/de/hu, hand-written attacks), agent-traffic 900 (synthetic tool output), public-deepset 452 (external user-prompt set, binary).
 <!-- results:end -->
@@ -241,6 +241,21 @@ Indirect prompt injection is mainstream agent security; here is how spanguard si
 | **NotInject** (over-defense benchmark) | 339 benign samples, false-positive testing | FP rate | measures the axis spanguard treats as first-class (over-strip); adopting it as a standard column is roadmap work |
 
 **Meta stack use.** Muse Spark Open runs inside spanguard twice, both logged: the teacher pass ($3.91, 1,150 calls — an independent precision check on the generator) and the opt-in `audit` mode for ambiguous remnants. It is not a hidden dependency of the detector itself.
+
+## Domain expansion: corpus v3 and char-v3 (extended domain, shipped)
+
+Corpus v3 adds the 2026 attack surface to the generator — **MCP tool-description
+poisoning, agent skill/config files, buried multi-hop payloads, markdown-image
+exfiltration, polite social-engineering** — plus Bangla as a 5th language
+(14,000 docs, 16 families, seed-locked, manifest committed). The 0.79M char model
+retrained on it ([spanguard-char-v3](https://huggingface.co/Nabidnur/spanguard-char-v3))
+covers the new families at **0.4% escape / span F1 0.996** where the previous
+char model washed out at **11.6% escape / span F1 0.467** (buried multi-hop alone:
+33.3% escape). The honest cost: extended-domain training regresses on the ORIGINAL
+hand-written OOD set (4.2% → 12.5% escape) — new-domain coverage trades old-domain
+sharpness. Both models ship and are benchmarked side by side
+(`eval/results/charv3-extended-*/`, `eval/results/charv3-std-*/`); routing by
+document type is the obvious next step and stated as such, not claimed.
 
 ## Adaptive red-team loop (idea A, first cut)
 
