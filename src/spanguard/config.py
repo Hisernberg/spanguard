@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Settings:
-    mode: str = "fast"                    # rules | fast | audit
+    mode: str = "fast"                    # rules | fast | fast-v2 | audit
     model_id: str | None = None
     threshold: float = 0.5
     upstream_url: str = "https://inference.baseten.co/v1"
