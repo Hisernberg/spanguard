@@ -1,5 +1,43 @@
 <!-- CURRENT -->
-## 当前状态（v5.0.0 FINALIZATION ROUND SHIPPED，2026-11-04）
+## 当前状态（v6 IN FLIGHT，2026-11-04 晚 —— 收尾冲刺被会话时限截断）
+
+- **v6 代码与资产全部完成并已 push（main @ 5833c85+）**：
+  - v6-F conformal 校准（src/spanguard/detect/conformal.py，分級 split-conformal，
+    α 扫描 [0.05,0.10,0.25,0.50]，smallest-passing-alpha 选择）+ Guard(fm-v6) 模式
+    （无校准文件时拒绝默认阈值，degraded 可见）。
+  - v6-B task-gate 运行时（Guard(task=…) 不确定带二次判定）。
+  - 规则加固（语义裁判驱动的自审计闭环）：句子感知 gap 类（修 [^.\n] 无法跨 .env/URL
+    点号的系统性盲区）+ 句级剥离窗口 + v6 红队模式（directives/commands/policies、
+    passive exfil、output-restrict、secret-paste 等）—— **v3 red-team 30/30 全剥离**。
+  - 评测资产：extended-v6 500-doc（250/250，20 族，7 语言，与训练不相交）、
+    notinject_benign 120、agentdojo-wrapped 72（真实 agentdojo v1.1.1 官方模板×goal；
+    import-cycle workaround：先 `import agentdojo.task_suite.task_suite`）。
+  - ONNX：fm.onnx（fp32）+ onnx_export_report.json 已传 HF spanguard-fm-1；
+    **int8（dynamic+static）判定漂移且不提速 → 拒绝**（诚实记录）。
+  - 视频渲染器 scripts/video_render.py（帧+TTS+ffmpeg，NUMBERS 表待填）。
+  - 测试 39 绿 1 skip（权重缺失自动跳过）。
+- **v6 模型已训成（Kaggle P100，kernel v5，7 分钟）**：
+  - fm-large 3.47M（corpus-v4+v6-addendum 22k docs）：dev escape 0.17% / over-strip
+    0% / doc F1 0.999。task-gate 292k：dev acc 69%（弱，如实报告）。
+  - 权重在 /tmp/kv6-out/（会话结束即失）+ 已复制 download/v6-artifacts/。
+  - **HF 上传被 429 挡住（Nabidnur/spanguard-fm-large / spanguard-taskgate 未建）**——
+    续作第一步：从 download/v6-artifacts/ 上传这两个仓库。
+- **Mega-run（scripts/v6_mega_run.sh → v6_calibration_and_eval.py）跑到 D 阶段**：
+  已知结果（第一次完整 A/B + 第二次进度）：fm-large+conformal 在
+  extended-v6/extended-attacks/extended-v4 **全 0 逃逸**、extended-v6 良性过剥
+  0.8%、notinject 0-1.7%；α 扫描显示 held-out benign 最差 14-16%（agent-traffic
+  OOD 偏移，保形界不迁移——如实报告）；**OOD 短板仍在**：handwritten escape
+  22.6%（fm-v6）vs fast-v4 ~4%；agentdojo-wrapped escape 37.5%（fm-v6, α=0.5）
+  —— router 栈仍是 OOD 旗舰；task-gate 在 shipped α 下 band 为空、无可测效果
+  （如实报告）。C 阶段（run_eval 直调已修）、D（harness f-string 已修）、
+  E（latency）—— **重跑 `bash scripts/v6_mega_run.sh` 即得全量 v6-final 记录 +
+  /tmp/v6-summary.json**。
+- 下一步顺序：① 上传两个 v6 模型仓库到 HF（429 恢复后）→ ② 重跑 mega-run →
+  ③ 语义裁判全量（eval/semantic_judge.py --modes fm-v6,fast-v4）→ ④ v6 图表 →
+  ⑤ README v6 + rating 重评 → ⑥ website v6 数字 + Vercel 重部署（token 已存）→
+  ⑦ suite 仓库 v6 更新 → ⑧ 视频（NUMBERS 填入后 python scripts/video_render.py）。
+
+## 历史：v5.0.0 FINALIZATION ROUND SHIPPED（2026-11-04）
 
 - **收尾轮全部完成并上线**（main @ 1620958+）：
   - **测试 33/33 绿**：新增 tests/test_v4_routing.py（is_structured 载体分类、route_v4
