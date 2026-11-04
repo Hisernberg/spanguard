@@ -314,3 +314,21 @@ open(os.path.join(gate_dir, "gate_meta.json"), "w").write(json.dumps(
      "train_pairs": len(gate_train), "dev_pairs": len(gate_dev),
      "labels": {0: "strip (off-task or injection)", 1: "keep (task-relevant)"}}, indent=1))
 print("ALL DONE in", round((time.time() - t_start) / 60, 1), "min", flush=True)
+
+# ---------------------------------------------------------------- HF upload
+# The sandbox's Kaggle API token lost kernels.get scope, so /kaggle/working
+# artifacts were unreachable — the kernel now ships its own weights to HF.
+try:
+    from huggingface_hub import HfApi
+
+    import os as _os
+    api = HfApi(token=_os.environ.get("KAGGLE_HF_TOKEN", ""))
+    api.create_repo("Nabidnur/spanguard-fm-large", exist_ok=True, private=False)
+    api.upload_folder(folder_path=fm_dir, repo_id="Nabidnur/spanguard-fm-large",
+                      commit_message="v6: SPG-FM-Large (3.47M, corpus-v4 + v6 adversarial addendum)")
+    api.create_repo("Nabidnur/spanguard-taskgate", exist_ok=True, private=False)
+    api.upload_folder(folder_path=gate_dir, repo_id="Nabidnur/spanguard-taskgate",
+                      commit_message="v6: task-conditioned gate (292k)")
+    print("HF upload complete", flush=True)
+except Exception as exc:  # noqa: BLE001
+    print("HF upload FAILED:", str(exc)[:300], flush=True)
