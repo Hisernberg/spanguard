@@ -25,6 +25,9 @@ SET_FILES = {
     "public-deepset": ["public-deepset.jsonl"],
     "extended-attacks": ["extended-attacks.jsonl"],
     "extended-v4": ["extended-v4.jsonl"],
+    "extended-v6": ["extended-v6.jsonl"],
+    "agentdojo-wrapped": ["agentdojo-wrapped.jsonl"],
+    "notinject_benign": ["notinject_benign.jsonl"],
 }
 
 
