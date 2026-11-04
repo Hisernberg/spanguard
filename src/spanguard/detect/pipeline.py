@@ -13,7 +13,7 @@ from .strip import strip_spans
 _PROSE_HIGH_CONF = 0.85   # span-model confidence that stands alone on unstructured text
 _PROSE_CHAR_BUMP = 0.1    # char-model threshold bump on unstructured text
 _PROSE_SLACK = 25         # char/span corroboration tolerance (chars)
-_STRUCTURED = re.compile(r"\{|\}|^\s*\w+=\S+|\s\|\s", re.MULTILINE)
+_STRUCTURED = re.compile(r"\{|\}|\w+=\S+|\s\|\s|^[^\n,]+(,[^\s,][^\n,]*){2,}\s*$|\t", re.MULTILINE)
 
 
 def is_structured(text: str) -> bool:
@@ -74,11 +74,12 @@ class Guard:
                 if "model:torch-not-installed" not in self.degraded:
                     self.degraded.append("model:torch-not-installed")  # visible in /healthz
         if self.mode in {"fast-v2", "fast-v3", "fast-v4", "fm"}:
+            fm_doc_p = None
             try:
                 thr = self.char_threshold(text)
                 if self.mode == "fm":
                     from .router import fm_char_spans
-                    char_spans, _, _route = fm_char_spans(text, threshold=thr)
+                    char_spans, fm_doc_p, _route = fm_char_spans(text, threshold=thr)
                 elif self.mode == "fast-v3":
                     from .router import routed_char_spans
                     char_spans, _, _route = routed_char_spans(text, threshold=thr)
@@ -89,10 +90,18 @@ class Guard:
                     char_spans, _ = self.char_model(text, threshold=thr)
                 self._char_ok = True
                 prose = not is_structured(text)
-                if self.mode in {"fast-v3", "fast-v4", "fm"}:
+                if self.mode == "fm":
+                    # The foundational model carries its own document-level head:
+                    # on prose, its verdict is the in-model corroboration signal.
+                    if prose and fm_doc_p is not None and fm_doc_p >= 0.5:
+                        prose = False
+                elif self.mode in {"fast-v3", "fast-v4"}:
                     from .router import is_extended_domain, route_v4
-                    routed = (is_extended_domain(text) if self.mode == "fast-v3"
-                              else route_v4(text) in {"v3", "v4"} if self.mode == "fast-v4" else True)
+                    # fast-v3 trusts union only on extended-domain docs (v3.1 design);
+                    # fast-v4 routes EVERY doc to one of the three char experts, so
+                    # every doc is "routed" — the expert's own calibration is the
+                    # prose guard (that is what the v4.0.0 record was measured with).
+                    routed = (is_extended_domain(text) if self.mode == "fast-v3" else True)
                     if routed:
                         prose = False  # routed docs trust the in-domain char model (union)
                 if prose:
@@ -157,11 +166,11 @@ class Guard:
             _, _, calib = _load(dir_path)
             base = calib.get("threshold", 0.5)
             if self.mode in {"fast-v3", "fast-v4", "fm"}:
-                from .router import is_extended_domain, route_v4
+                from .router import is_extended_domain
                 # prose bump protects against neural FPs on out-of-domain prose;
-                # routed (in-domain) docs use the routed model's own calibration
-                routed = (is_extended_domain(text) if self.mode == "fast-v3"
-                          else route_v4(text) in {"v3", "v4"} if self.mode == "fast-v4" else True)
+                # routed docs use the routed model's own calibration — and in
+                # fast-v4 every doc is routed to one of the three experts
+                routed = (is_extended_domain(text) if self.mode == "fast-v3" else True)
                 bump = 0.0 if routed else (_PROSE_CHAR_BUMP if not is_structured(text) else 0.0)
                 return base + bump
             return base + (_PROSE_CHAR_BUMP if not is_structured(text) else 0.0)

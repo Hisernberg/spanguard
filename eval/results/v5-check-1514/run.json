@@ -1,0 +1,76 @@
+{
+  "generated_at": "2026-11-04T15:14:35+00:00",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-5.10.134-013.15.kangaroo.al8.x86_64-x86_64-with-glibc2.41"
+  },
+  "systems": {
+    "spanguard-fast-v3": {
+      "sets": {
+        "handwritten": {
+          "docs": 62,
+          "planted": 48,
+          "escape_rate": 0.2917,
+          "overstrip_rate": 0.087,
+          "doc_precision": 0.9211,
+          "doc_recall": 0.7292,
+          "doc_f1": 0.814,
+          "span_precision": 0.2088,
+          "span_recall": 0.3958,
+          "span_f1": 0.2734,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "de": {
+              "escape_rate": 0.0769,
+              "docs": 17
+            },
+            "en": {
+              "escape_rate": 0.375,
+              "docs": 31
+            },
+            "hu": {
+              "escape_rate": 0.3636,
+              "docs": 14
+            }
+          },
+          "per_family": {
+            "encoding": {
+              "escape_rate": 0.0,
+              "planted": 2
+            },
+            "exfil-secret": {
+              "escape_rate": 0.5714,
+              "planted": 7
+            },
+            "exfil-url": {
+              "escape_rate": 0.0,
+              "planted": 7
+            },
+            "forgery": {
+              "escape_rate": 0.3,
+              "planted": 10
+            },
+            "impersonation": {
+              "escape_rate": 0.1667,
+              "planted": 6
+            },
+            "narrative": {
+              "escape_rate": 0.7143,
+              "planted": 7
+            },
+            "override": {
+              "escape_rate": 0.2,
+              "planted": 5
+            },
+            "smuggle": {
+              "escape_rate": 0.0,
+              "planted": 4
+            }
+          }
+        }
+      },
+      "wallclock_s": 3
+    }
+  }
+}

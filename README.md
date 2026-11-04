@@ -12,9 +12,10 @@
 [![Demo video](https://img.shields.io/badge/demo%20video-3--min-blue)](https://github.com/Hisernberg/spanguard#demo)
 
 <!-- intro:start -->
-- **What it does.** An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; validated rules, a 135M-parameter multilingual span model and a 0.79M char-level multi-task model find prompt-injection text inside the data and replace each span with [stripped], while orders, totals, names and JSON structure survive untouched. The fast-v2 ensemble gates the detectors by document structure: high-recall union on tool output, corroboration on prose.
-- **How well (v4 flagship).** `fast-v4` — validated rules + a 135M multilingual span model + a 3-level char router — escapes **0.0%** of planted payloads on the 900-document agent-traffic set (4.7% benign over-strip) and on both extended attack fixtures: the 88-doc extended-attacks set at **0.0% escape / 0.0% over-strip / doc F1 1.000** and the 108-doc extended-v4 fixture at **0.0% / 0.2% / doc F1 0.986** across all 7 languages (en/de/hu/fr/bn/ar/ja). Whole-document binary guards on that same 108-doc fixture miss 6.9–40.3% of attacks while stripping everything they flag: protectai deberta-v3-injection-v2 escapes **40.3%**, horizon-small 6.9%, horizon-base 8.3%. The honest trade stays published: on the original hand-written OOD set the router keeps 16.7% escape at 9.3% over-strip, and the v4-trained char model alone goes 0.0% escape for 44% over-strip — the router exists so you don't have to choose. A 0.5B LLM asked to flag its own injections misses 91.7% of attacks.
-- **Domain foundation (new in v4/v5).** corpus-v4 doubles the carrier surface — log-file poisoning, code-comment injection, RAG-chunk poisoning plus in-domain Arabic and Japanese (16,000 seed-locked docs, 7 languages, 18 families). Zero-shot, the v3 models washed out on exactly this: char-v3 escaped 30.7% of Arabic and 34.0% of Japanese attacks; the span model missed 76.2% of log-poison spans. After v4 training: **0.0% escape in every one of the 7 languages** (measured per-language on the fixture), and v5's SPG-FM-1 collapses the whole router stack into one 1.7M-parameter foundational model trained on the union.
+- **What it does.** An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; validated rules, a 135M-parameter multilingual span model and a family of sub-million char-level models find prompt-injection text inside the data and replace each span with `[stripped]`, while orders, totals, names and JSON structure survive untouched.
+- **v5 headline — SPG-FM-1, one model instead of a stack.** A 1.7M-parameter char-level multi-task network trained on the full corpus-v4 union replaces the regex router + three experts: **0.0% escape on every in-domain set, in all 7 languages (en/de/hu/fr/bn/ar/ja), with doc F1 1.000 on both extended fixtures** and the best payload localization in the family (span F1 0.917/0.901 vs 0.689/0.612 for the router stack) at p50 36.7 ms on CPU. The honest cost, published not hidden: on out-of-domain prose the single model over-strips (45.4% of benign chars on the public probe, 26.4% on hand-written benign) because its document head fires eagerly on prose it has never seen — the router stack keeps the fidelity crown there (24.6% / 17.5%), and closing that axis is roadmap item B/F.
+- **How well (fast-v4, repaired + re-measured).** `fast-v4` — validated rules + the 135M span model + a 3-level char router — escapes **0.0%** of planted payloads on the 900-document agent-traffic set (5.1% benign over-strip) and on both extended attack fixtures: **0.0% escape / 0.0% over-strip / doc F1 1.000** on extended-attacks (all five 2026 carrier families at 0.0%) and **0.0% / 0.1%** on the 108-doc extended-v4 fixture across all 7 languages. The v5 re-measurement also moved its hand-written OOD escape from the published 16.7% to **4.2%** — the all-time best for any spanguard stack — after repairing two orchestration regressions the restore surfaced (see the v5 section for the full account; both runs are committed). Whole-document binary guards on the same fixture miss 6.9–40.3% of attacks while stripping everything they flag.
+- **Domain foundation.** corpus-v4 doubles the carrier surface — log-file poisoning, code-comment injection, RAG-chunk poisoning plus in-domain Arabic and Japanese (16,000 seed-locked docs, 7 languages, 18 families). Zero-shot, the v3 models washed out on exactly this: char-v3 escaped 30.7% of Arabic and 34.0% of Japanese attacks; the span model missed 76.2% of log-poison spans. After v4 training: **0.0% escape in every one of the 7 languages** — and v5's SPG-FM-1 collapses the whole stack into one model trained on the union.
 - **Measured in the open.** Committed run records per system and set (eval/results/), fictional data only, an external public set for generalization, per-attack-family heatmaps, CPU latency measured where each system ran, and a cost ledger. Rerun everything with `make eval` + the Kaggle kernels in training/train/.
 <!-- intro:end -->
 
@@ -23,14 +24,15 @@
 ## Demo — 30 seconds, no install
 
 **[Open the live inference Space](https://huggingface.co/spaces/Nabidnur/spanguard-demo)** —
-runs the actual pipeline in-app (rules + 135M span model + char router on a free CPU
-bucket). Pick one of the fifteen built-in payloads — the 2026 carrier families
-(MCP tool poisoning, skill files, buried multi-hop, md-image exfiltration, log poisoning,
-code-comment injection, RAG-chunk poisoning) in 7 languages — or paste your own text:
-attack spans highlighted per detector, typed `[stripped:*]` markers in the cleaned output,
-findings table with offsets and payload hashes, per-run latency. Nothing is hand-rendered;
-every verdict is a real `Guard(mode="fast-v4")` run. A static 15-card visual walkthrough of
-the same runs ships in the repo: [docs/demo/visual-inference.html](docs/demo/visual-inference.html).
+runs the actual pipeline in-app (rules + 135M span model + the char-router stack on a free
+CPU bucket; SPG-FM-1 is a one-line env switch away). Pick one of the fifteen built-in
+payloads — the 2026 carrier families (MCP tool poisoning, skill files, buried multi-hop,
+md-image exfiltration, log poisoning, code-comment injection, RAG-chunk poisoning) in 7
+languages — or paste your own text: attack spans highlighted per detector, typed
+`[stripped:*]` markers in the cleaned output, findings table with offsets and payload
+hashes, per-run latency. Nothing is hand-rendered; every verdict is a real gateway run. A
+static 15-card visual walkthrough of the same runs ships in the repo:
+[docs/demo/visual-inference.html](docs/demo/visual-inference.html).
 
 Prefer a terminal?
 
@@ -117,7 +119,7 @@ One corpus, one family — every member shipped, published, and benchmarked:
 | [`spanguard-char`](https://huggingface.co/Nabidnur/spanguard-char) | char-level **spans + document verdict** from one 0.79M model (sub-ms CPU tier; the corroboration signal inside fast-v2) | 0.79M dilated conv, dual head | escape vs over-strip frontier, doc F1 — **beats the 135M span model on hand-written OOD escape (4.2% vs 29.2%)** |
 | [`spanguard-char-v3`](https://huggingface.co/Nabidnur/spanguard-char-v3) | the same tier domain-expanded to MCP/skill/buried/md-image + Bangla | 0.79M dilated conv, dual head | extended domain 0.4% escape / span F1 0.996 (char-v2 washed out: 11.6% / 0.467) |
 | [`spanguard-char-v4`](https://huggingface.co/Nabidnur/spanguard-char-v4) | the domain-foundation tier: corpus-v4 union — log/code/rag carriers + Arabic + Japanese | 812k dilated conv, dual head | **extended-v4 fixture: 0.0% escape in all 7 languages / 0.0% over-strip / doc F1 1.000 / span F1 0.955** |
-| **SPG-FM-1** (v5, [`spanguard-fm-1`](https://huggingface.co/Nabidnur/spanguard-fm-1)) | **the domain foundational model**: one model for every domain — replaces the router + 3 experts; one forward pass emits doc verdict + payload spans | 1.70M dilated conv, dual head, 512ch/6 blocks | benchmark vs fast-v4 router stack lands in `eval/results/v5-fm-*/` |
+| **SPG-FM-1** (v5, [`spanguard-fm-1`](https://huggingface.co/Nabidnur/spanguard-fm-1)) | **the domain foundational model**: one model for every domain — replaces the router + 3 experts; one forward pass emits doc verdict + payload spans | 1.70M dilated conv, dual head, 512ch/6 blocks | **0.0% escape on every in-domain set, all 7 languages; span F1 0.917/0.901 (best in family); 10.4% hand-written OOD — measured table below** |
 | [`spanguard-docguard-mdistil`](https://huggingface.co/Nabidnur/spanguard-docguard-mdistil) | whole-document **attack classifier** (the one-bit baseline, trained on the same data for a fair fight) | 135M seq-cls | doc P/R/F1, false-block rate |
 | [`spanguard-toolguard-mdistil`](https://huggingface.co/Nabidnur/spanguard-toolguard-mdistil) | **tool-call / function-argument** guard: is this call itself malicious? | 135M seq-cls | block-recall vs false-block on held-out generated calls |
 
@@ -149,6 +151,33 @@ Per-language doc escape for char-v4 on the same fixture: **en 0.0 · de 0.0 · h
 the ar/ja zero-shot washout (30.7% / 34.0%) is eliminated, not mitigated
 ([records](eval/results/v4-flagship-1826/run.json) · [lang-matrix chart](docs/benchmarks/lang-matrix.svg) ·
 [v4-frontier chart](docs/benchmarks/v4-frontier.svg)).
+
+### The v5 headline — both flagships, one run, same code (eval/results/v5-ship-1548)
+
+| set | SPG-FM-1 (1.7M, single model) | fast-v4 (rules + span + 3-level router) |
+|---|---|---|
+| hand-written attacks · 62 docs (OOD) | 10.4% escape · 26.4% over-strip | **4.2% escape · 17.5% over-strip** |
+| agent traffic · 900 docs | **0.0% escape** · 5.2% over-strip | **0.0% escape** · 5.1% over-strip |
+| public prompts · 452 docs (over-strip probe) | 0.0% · 45.4% over-strip | 0.0% · **24.6%** over-strip |
+| extended-attacks · 88 docs · 5 carrier families | **0.0% / 0.0% / doc F1 1.000 / span F1 0.917** | **0.0% / 0.0% / doc F1 1.000** / span F1 0.689 |
+| extended-v4 · 108 docs · 7 languages | **0.0% / 0.0% / doc F1 1.000 / span F1 0.901** | **0.0% / 0.1% / doc F1 0.993** / span F1 0.612 |
+| latency (fresh, 2-thread sandbox CPU) | p50 36.7 ms · p95 65.6 ms | p50 14.6 ms · p95 41.6 ms |
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/v5_flagship_bars.png">
+  <img src="docs/assets/v5_flagship_bars.png" alt="Escape and over-strip for SPG-FM-1 vs fast-v4 across the five benchmark sets: fm holds 0% escape everywhere in-domain; fast-v4 keeps the over-strip crown on prose." width="100%">
+</picture>
+
+Read the pair as a deliberate two-flagship lineup, both shipped with the package:
+
+- **SPG-FM-1 is the coverage flagship.** No router, no language detection, one 1.7M forward
+  pass: 0.0% escape on agent traffic and on both extended fixtures, **0.0% in all seven
+  languages** (per-language rows in the run record), and the best span localization in the
+  family (span F1 0.917 / 0.901 — the router stack sits at 0.689 / 0.612). On hand-written
+  OOD it matches the whole v2-era ensemble (10.4%) with 1.7M parameters instead of 135M+.
+- **fast-v4 is the fidelity flagship.** After the v5 orchestration repair (below) it posts
+  the best OOD escape ever measured for the stack (**4.2%**) while keeping 0.0% escape on
+  every in-domain set and the lowest prose over-strip (24.6% public / 17.5% hand-written).
 
 ### The full five-set sweep
 
@@ -230,8 +259,9 @@ never leaves in any mode).
 ## Threat model & limits
 
 - **In scope:** indirect prompt injection arriving through tool results, fetched pages, logs,
-  JSON payloads, tickets, emails, in en/de/hu — including encoded (base64/hex) and
-  invisible-unicode smuggling variants.
+  JSON payloads, tickets, emails, MCP tool definitions, skill files, RAG chunks — in
+  en/de/hu/fr/bn/ar/ja — including encoded (base64/hex) and invisible-unicode smuggling
+  variants.
 - **Out of scope:** jailbreaks typed directly by the app's own user (that channel already has
   guard models), malware/sandboxing, data loss prevention, and any guarantee. Stripping is a
   mitigation, not proof of safety; the [audit mode](docs/threat-model.md) adds an LLM second
@@ -342,12 +372,67 @@ and still miss 7–40% of attacks, while the char-level span model removes exact
 ## v5: SPG-FM — the domain foundational model (one model instead of a stack)
 
 The v2→v4 pattern shipped one small expert per domain plus a regex router. v5 collapses the
-stack: **SPG-FM-1** ([train_fm.py](training/train_fm.py)) is a single char-level multi-task
-network (1.70M params, channels 512 / blocks 6 / emb 96) trained on the **full corpus-v4
-union** — every language and carrier family the router used to dispatch between — emitting
-both the document verdict and the payload spans in one forward pass. In-domain coverage no
-longer depends on the router being right; there is no routing decision to get wrong.
-Status: training on the full corpus-v4 union is in flight (checkpointed every 500 steps); the measured benchmark vs fast-v4 lands in this section and in `eval/results/v5-fm-*/` when the run completes.
+stack: **SPG-FM-1** ([train_fm.py](training/train_fm.py), published at
+[`Nabidnur/spanguard-fm-1`](https://huggingface.co/Nabidnur/spanguard-fm-1)) is a single
+char-level multi-task network (1.70M params, channels 512 / blocks 6 / emb 96, 499-char
+vocab) trained on the **full corpus-v4 union** — every language and carrier family the
+router used to dispatch between — emitting both the document verdict and the payload spans
+in one forward pass. In-domain coverage no longer depends on the router being right; there
+is no routing decision to get wrong. Trained in a committed Kaggle P100 kernel at
+~12,000 docs/min (2 epochs over 16,000 docs, checkpointed every 500 steps); dev calibration
+lands at span precision 1.000 / recall 0.998 with **0.19% escape and 0.0% over-strip** at
+the shipped threshold 0.25 (`data/models/spanguard-fm-1/calibration.json`).
+
+**Measured (v5-ship-1548, full table above):** 0.0% escape on agent-traffic (900 docs),
+extended-attacks (88 docs, all five 2026 families) and extended-v4 (108 docs) with **doc
+F1 1.000 on both extended fixtures and span F1 0.917 / 0.901 — the best payload
+localization in the family**. Per-language on extended-v4: en/de/hu/fr/bn/ar/ja all 0.0% —
+one model, no language detection
+([language chart](docs/assets/v5_languages.png)). On the hand-written OOD set fm holds
+**10.4% escape** — the same number the full fast-v2 ensemble (rules + 135M span + char
+ensemble + corroboration) reached with 1.7M parameters total.
+
+**The honest cost, stated as measured:** SPG-FM-1's document head fires eagerly on
+out-of-domain benign prose, so on the public over-strip probe it destroys 45.4% of benign
+characters (26.4% on hand-written benign) where the router stack sits at 24.6% / 17.5%.
+The doc head is what buys the record OOD recall — on prose it is also the over-strip
+source. Both numbers are committed; roadmap items **B (task-conditioned stripping)** and
+**F (conformal threshold calibration)** attack exactly this axis, and fm's 2-4 ms span
+head leaves headroom for both.
+
+<picture>
+  <img src="docs/assets/v5_frontier.png" alt="Version ladder: hand-written OOD escape, public over-strip and extended-attacks span F1 across v1, v2, v3.1, v4 and v5." width="100%">
+</picture>
+
+### The v5 orchestration repair — what the restore surfaced, fixed and re-measured
+
+Re-building the sandbox from the HF code mirror reproduced an orchestration regression:
+the restored pipeline sent log/CSV-style documents down the prose channel (the
+`is_structured` pattern had lost the anywhere-in-line `k=v`, comma-CSV and tab carriers),
+which discarded char-model hits that the union channel would have kept. Three fixes,
+all measured in the committed v5-ship run:
+
+1. **`is_structured` rebuilt** to match the corpus carrier taxonomy: `k=v` pairs anywhere
+   in a line (log lines like `2026-10-29 INFO order=FE-44812`), tight CSV rows (≥2 commas,
+   no post-comma spaces — a prose sentence with commas does not match), tabs, braces and
+   pipe tables.
+2. **fast-v4 union-everywhere restored** — the 3-level router routes *every* document to
+   one of the three char experts, so every doc trusts its routed expert's calibration
+   (the v4.0.0 record was measured with this behavior; the restore had narrowed trust to
+   v3/v4-routed docs only, which leaked the polite social-engineering family).
+3. **fm prose gating** — SPG-FM's own document head corroborates prose docs (doc
+   probability ≥ 0.5 takes the union channel); the span head alone keeps the old
+   corroboration rule for low-confidence prose.
+
+Result: fast-v4's hand-written OOD escape moved 16.7% (v4 record) → 29.2% (broken
+restore) → **4.2%** (repaired), extended-attacks 7.1% → **0.0%**, and the fm numbers
+above are all from the repaired pipeline. The broken intermediate runs are committed
+too (`v5-fm-1504`, `v5-check-1514`, `v5-final-1519`) so the whole episode is auditable;
+`v5-ship-1548` is the release run.
+
+<picture>
+  <img src="docs/assets/v5_cost.png" alt="Size vs OOD escape across the family and fresh latency measurements for both flagships." width="100%">
+</picture>
 
 ## Domain expansion: corpus v3 and char-v3 (extended domain, shipped)
 
@@ -395,8 +480,9 @@ If you use spanguard or the benchmark protocol, please cite the repo:
   title   = {SpanGuard: span-level prompt-injection stripping for AI agent tool traffic},
   year    = {2026},
   url     = {https://github.com/Hisernberg/spanguard},
-  note    = {Three 135M-parameter guards (span / document / tool-call) trained on a
-             deterministic fictional en/de/hu corpus; escape and over-stripping
+  note    = {A 135M multilingual span tagger, a family of sub-million char-level experts
+             and a 1.7M single-model foundational variant (SPG-FM-1), trained on a
+             deterministic fictional 7-language corpus; escape and over-stripping
              reported together on committed run records}
 }
 ```
