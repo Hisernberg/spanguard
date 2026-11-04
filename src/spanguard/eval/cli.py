@@ -167,6 +167,12 @@ def run_eval(systems: list[str], sets: list[str], tag: str | None = None, limit:
             except Exception as exc:  # noqa: BLE001
                 print(f"skip spg-fm: {exc}")
                 continue
+        elif sysname == "spg-fm-v6":
+            try:
+                fn = guard_system("fm-v6")
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spg-fm-v6: {exc}")
+                continue
         elif sysname == "spanguard-fast-v4":
             try:
                 fn = guard_system("fast-v4")

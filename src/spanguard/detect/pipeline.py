@@ -26,14 +26,18 @@ class Guard:
     """One guard instance; mode selects detectors, one shared SpanModel."""
 
     def __init__(self, mode: str = "fast", model_id: str | None = None, threshold: float = 0.5,
-                 typed_markers: bool = True):
-        if mode not in {"rules", "fast", "fast-v2", "fast-v3", "fast-v4", "fm", "audit"}:
+                 typed_markers: bool = True, task: str | None = None):
+        if mode not in {"rules", "fast", "fast-v2", "fast-v3", "fast-v4", "fm", "fm-v6",
+                        "audit"}:
             raise ValueError(f"unknown mode {mode!r}")
         self.mode = mode
         self.threshold = threshold
         self.typed_markers = typed_markers
+        self.task = task  # v6-B: the user's goal, enables task-conditioned stripping
         self._model = None
         self._char = None
+        self._policy = None
+        self._gate = None
         self.model_id = model_id
         self.last_latency_ms: float | None = None
         # honest degradation tracking: what the caller asked for vs what actually loaded
@@ -59,6 +63,10 @@ class Guard:
 
     def guard(self, text: str) -> Result:
         t0 = time.monotonic()
+        if self.mode == "fm-v6":
+            result = self._guard_fm_v6(text)
+            self.last_latency_ms = round((time.monotonic() - t0) * 1000, 1)
+            return result
         spans = rules_mod.detect_rules(text)
         model_spans_kept: list = []
         if self.mode in {"fast", "fast-v2", "fast-v3", "fast-v4", "fm", "audit"}:
@@ -142,6 +150,42 @@ class Guard:
         self.last_latency_ms = round((time.monotonic() - t0) * 1000, 1)
         return result
 
+    def _guard_fm_v6(self, text: str) -> Result:
+        """v6: SPG-FM + split-conformal span threshold + optional task gate.
+
+        Rules still strip (they are precise); the fm model contributes scored
+        candidate spans that the conformal policy (and, for uncertain-band spans,
+        the task gate) decides on. The 135M span model and the router are NOT
+        part of this mode — one model, calibrated, no ensemble."""
+        from ..types import Span
+
+        spans: list = list(rules_mod.detect_rules(text))
+        try:
+            from .conformal import ConformalPolicy, TaskGate, fm_v6_decide
+
+            if self._policy is None:
+                self._policy = ConformalPolicy()
+            if not self._policy.available:
+                # No conformal calibration shipped with the model: refuse to make
+                # neural strip decisions on a default threshold (that default is
+                # exactly what caused the v5 over-strip axis). Rules still fire.
+                if "fm-v6:no-calibration" not in self.degraded:
+                    self.degraded.append("fm-v6:no-calibration")
+            else:
+                if self.task and self._gate is None:
+                    self._gate = TaskGate()
+                decision = fm_v6_decide(text, task=self.task, policy=self._policy,
+                                        gate=self._gate)
+                self._char_ok = True
+                for a, b, score, reason in decision["strip"]:
+                    spans.append(Span(start=a, end=b, kind="injection",
+                                      source=f"spg-fm-v6:{reason}", confidence=score))
+        except (ImportError, FileNotFoundError, OSError) as exc:
+            tag = f"fm-v6:{type(exc).__name__}"
+            if tag not in self.degraded:
+                self.degraded.append(tag)
+        return strip_spans(text, spans, typed=self.typed_markers)
+
     def char_threshold(self, text: str) -> float | None:
         """Calibrated char threshold, bumped up on prose to protect over-strip.
         fast-v3 reads the ROUTED model's calibration (v3 models calibrate lower)."""
@@ -191,6 +235,9 @@ class Guard:
             d.append("char" if self.mode == "fast-v2"
                      else "char-router(v2+v3)" if self.mode == "fast-v3"
                      else "char-router(v2+v3+v4)" if self.mode == "fast-v4" else "spg-fm-1")
+        if self.mode == "fm-v6" and self._char_ok:
+            d.append("spg-fm-v6" + ("+task-gate" if self.task and self._gate is not None
+                                    and self._gate.available else "+conformal"))
         if self.mode == "audit" and self._model_ok:
             d.append("audit")
         return d

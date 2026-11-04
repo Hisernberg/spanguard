@@ -1,0 +1,9 @@
+{
+ "train_add": 6000,
+ "adv": 3000,
+ "benign_hard": 3000,
+ "gate_train": 14000,
+ "gate_dev": 2000,
+ "gate_pos_rate_train": 0.337,
+ "gate_pos_rate_dev": 0.333
+}

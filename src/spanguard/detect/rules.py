@@ -35,11 +35,11 @@ def _p(name: str, kind: str, conf: float, pattern: str, flags: re.RegexFlag = re
 
 # --- override / instruction replacement -------------------------------------
 _p("override-ignore", "override", 0.95,
-   r"\b(?:ignore|disregard|forget|discard|override)\s+(?:all\s+|any\s+|the\s+|your\s+|their\s+|all\s+of\s+the\s+|any\s+of\s+the\s+|the\s+above\s+|your\s+prior\s+|"
+   r"\b(?:ignore|disregard|forget|discard|override|skip)\s+(?:all\s+|any\s+|the\s+|your\s+|their\s+|all\s+of\s+the\s+|any\s+of\s+the\s+|the\s+above\s+|your\s+prior\s+|the\s+(?:entire|whole|complete)\s+|"
    r"(?:all\s+)?(?:previous|prior|earlier|above|preceding)[\w\s]{0,20}?)?"
-   r"(?:instructions?|prompts?|directions?|rules?|guidelines?|constraints?|context|conversation|message|messages|task)\b")
+   r"(?:instructions?|prompts?|directions?|directives?|orders?|guardrails?|guard\s+rails?|rules?|guidelines?|constraints?|context|conversation|message|messages|task)\b")
 _p("override-replace", "override", 0.9,
-   r"\b(?:from\s+now\s+on|henceforth|instead)\b[^.\n]{0,60}\b(?:you\s+(?:are|must|will|should|have\s+to)|your\s+(?:task|goal|job|instructions?))\b")
+   r"\b(?:from\s+now\s+on|henceforth|instead)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,60}\b(?:you\s+(?:are|must|will|should|have\s+to)|your\s+(?:task|goal|job|instructions?))\b")
 _p("override-newtask", "override", 0.85,
    r"\b(?:real|actual|new|updated|revised|true)\s+(?:task|instructions?|objective|goal|mission)\s*:")
 
@@ -53,12 +53,30 @@ _p("dev-mode", "impersonation", 0.9, r"\b(?:developer\s+mode|dan\s+mode|do\s+any
 
 # --- exfiltration / secret hunting --------------------------------------------
 _p("exfil-send", "exfil", 0.9,
-   r"\b(?:send|post|submit|upload|forward|exfiltrate|transmit)\b[^.\n]{0,120}?(?:https?://|ftp://|\b(?:curl|wget)\b|requests\.(?:post|get)|fetch\()")
+   r"\b(?:send|post|submit|upload|forward|exfiltrate|transmit|dispatch|deliver|relay|transfer)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,120}?(?:https?://|ftp://|\b(?:curl|wget)\b|requests\.(?:post|get)|fetch\()")
 _p("exfil-include", "exfil", 0.85,
-   r"\b(?:include|append|add|embed|reveal|print|show|repeat|copy|quote)\b[^.\n]{0,80}?"
-   r"\b(?:api[\s_-]?key|api[\s_-]?secret|password|passphrase|access[\s_-]?token|auth[\s_-]?token|private[\s_-]?key|credentials?|env(?:ironment)?[\s_-]?variables?|\.env)\b")
+   r"\b(?:include|append|add|embed|reveal|print|show|repeat|copy|quote|provide|share|give|hand\s+over|expose|disclose)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,80}?"
+   r"\b(?:api[\s_-]?key|api[\s_-]?secret|secret[\s_-]?keys?|password|passphrase|access[\s_-]?token|auth[\s_-]?token|private[\s_-]?key|credentials?|env(?:ironment)?[\s_-]?variables?|\.env)\b")
 _p("secret-read", "exfil", 0.8,
-   r"\b(?:read|dump|list|load|grep|search)\b[^.\n]{0,60}?\b(?:\.env|credentials?|secrets?|api[\s_-]?keys?|passwords?|tokens?)\b[^.\n]{0,80}?\b(?:and\s+)?(?:then\s+)?(?:send|post|share|include|reply|output|return|report)\b")
+   r"\b(?:read|dump|list|load|grep|search|retrieve|locate|find|access)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,60}?\b(?:\.env|credentials?|secrets?|secret[\s_-]?keys?|api[\s_-]?keys?|passwords?|tokens?|stripe[\s_-]?keys?)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,80}?\b(?:and\s+)?(?:then\s+)?(?:send|post|share|include|reply|respond|output|return|report|disclose|reveal|paste|embed|repeat|appears?|shows?\s+up|ends\s+up|lands|is\s+(?:included|visible|present|shown|embedded|repeated)|must\s+(?:contain|show|include|reveal|display|list))\b")
+
+# --- v6 red-team-hardened block (gaps the semantic judge found) ----------------
+_p("override-ignore-v6", "override", 0.9,
+   r"\b(?:ignore|disregard|forget|discard|override)\s+(?:everything|all|any|each|every)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,60}?"
+   r"\b(?:said|told|received|before|above|earlier|prior|preceding|point|so\s+far|far)\b")
+_p("override-noun-v6", "override", 0.9,
+   r"\b(?:ignore|disregard|forget|discard|override|drop|bypass)\s+(?:all\s+|any\s+|every\s+|the\s+)?"
+   r"(?:internal\s+|external\s+|security\s+|safety\s+|content\s+)?"
+   r"(?:policies|policy|commands|command|directives|directive|guardrails|guard\s+rails|guardrails)\b")
+_p("output-restrict", "override", 0.75,
+   r"\b(?:respond|reply|answer|output|communicate)\s+(?:exclusively|only|solely|just)\s+(?:with|using|in)\b")
+_p("exfil-passive", "exfil", 0.85,
+   r"\b(?:log|transcript|conversation|history|dialogue|chat[\s_-]?log|message[\s_-]?(?:history|log)|data|output|contents?|payload|credentials?|keys?)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,60}?"
+   r"\b(?:uploaded|posted|sent|transmitted|forwarded|emailed|submitted|mirrored)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,60}?"
+   r"(?:https?://|ftp://|[\w.\-]+@[\w.\-]+|\bwebhook\b)")
+_p("secret-paste", "exfil", 0.85,
+   r"\b(?:paste|insert|embed|leak|expose|disclose|reveal)\b(?:(?![.!?]\s)(?![.!?]$)[^\n]){0,80}?"
+   r"\b(?:api[\s_-]?key|api[\s_-]?secret|secret[\s_-]?keys?|password|passphrase|access[\s_-]?token|auth[\s_-]?token|private[\s_-]?key|credentials?|\.env)\b")
 
 # --- forged structure ----------------------------------------------------------
 _p("fake-tool-result", "forgery", 0.9,
@@ -158,6 +176,37 @@ def _homoglyph_spans(text: str) -> list[Span]:
     return out
 
 
+def _sentence_window(text: str, spans: list[Span], max_expand: int = 400) -> list[Span]:
+    """v6: expand semantic-kinds rule hits to their full sentence.
+
+    The v3 red-team semantic judge showed WHY: stripping only the matched
+    phrase leaves the imperative action ("send the API key to [stripped:exfil]")
+    — the agent still reads the action, just without the address. Expanding to
+    the sentence removes the action itself. Only applies to the semantic kinds
+    (override / exfil / impersonation / forgery); encoding/smuggle/spoof stay
+    phrase-precise. Expansion is capped so a missing period can't eat a doc.
+    """
+    if not spans:
+        return spans
+    # sentence boundaries
+    bounds = [0]
+    for m in re.finditer(r"[.!?\n]+", text):
+        bounds.append(m.end())
+    bounds.append(len(text))
+    out = []
+    for s in spans:
+        if s.kind not in {"override", "exfil", "impersonation", "forgery"}:
+            out.append(s)
+            continue
+        start = max(b for b in bounds if b <= s.start)
+        end = min(b for b in bounds if b >= s.end)
+        if end - start <= max_expand:
+            out.append(Span(start, end, s.kind, s.source, confidence=s.confidence))
+        else:
+            out.append(s)
+    return out
+
+
 def detect_rules(text: str) -> list[Span]:
     """All rule hits for one text, no merging."""
     spans: list[Span] = []
@@ -172,4 +221,4 @@ def detect_rules(text: str) -> list[Span]:
     spans += _hex_spans(text)
     spans += _invisible_spans(text)
     spans += _homoglyph_spans(text)
-    return spans
+    return _sentence_window(text, spans)

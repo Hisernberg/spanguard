@@ -1,0 +1,42 @@
+{
+ "docs": 500,
+ "attack": 250,
+ "benign": 250,
+ "planted_spans": 257,
+ "families": {
+  "benign": 250,
+  "skill-file": 7,
+  "adv-paraphrase": 100,
+  "code-comment": 7,
+  "adv-crosslang": 75,
+  "log-poison": 7,
+  "buried-multihop": 7,
+  "smuggle-homoglyph": 2,
+  "rag-chunk": 10,
+  "md-image-exfil": 7,
+  "social-polite": 8,
+  "mcp-poison": 3,
+  "encoding-b64": 3,
+  "encoding-hex": 2,
+  "override": 2,
+  "narrative": 2,
+  "smuggle-unicode": 1,
+  "exfil-url": 2,
+  "impersonation": 3,
+  "forgery": 2
+ },
+ "languages": {
+  "hu": 63,
+  "ar": 64,
+  "bn": 67,
+  "de": 52,
+  "ja": 79,
+  "en": 95,
+  "fr": 80
+ },
+ "seed": 4242,
+ "disjoint_from": [
+  "corpus-v4 train+dev",
+  "corpus-v6-addendum"
+ ]
+}
