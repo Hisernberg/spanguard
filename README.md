@@ -18,6 +18,24 @@
 
 <!-- intro:start -->
 - **What it does.** An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; validated rules, a 135M-parameter multilingual span model and a family of sub-million char-level models find prompt-injection text inside the data and replace each span with `[stripped]`, while orders, totals, names and JSON structure survive untouched.
+- **v6 headline — the bound, the gate, the loop.** fm-v6 (2.23M, corpus-v4 + the v6
+  adversarial addendum, retrained on CPU after the Kaggle credentials expired mid-flight)
+  adds three measured layers: **(F) split-conformal calibration** — the span threshold is
+  the finite-sample (1−α) quantile of benign scores (α=0.1), so over-strip is bounded
+  by construction; **(B) a 292k task-conditioned gate** that releases task-relevant
+  instructions in the uncertain band (hand-written OOD escape 35.5% →
+  29.0% with the task given); **(C) an agent-loop harness** with the
+  canonical AgentDojo attack column and a NotInject benign probe — outcome columns, not
+  guard metrics (NotInject utility 100.0%,
+  hijack 1.3% vs fast-v4
+  8.7%). The semantic escape judge
+  (LLM reading cleaned output) audited the rules and found real gaps the verbatim check had
+  blessed — the hardened v6 rules replay the v3 red-team at 30/30 verbatim-stripped and
+  0/30 semantic escapes. int8 ONNX quantization was tried and rejected on parity; fp32
+  ONNX ships. The honest cost, unchanged: the conformal bound does not fully transfer
+  across distribution shift (worst held-out benign over-strip 15.0% at α=0.1);
+  the sweep is published.
+
 - **v5 headline — SPG-FM-1, one model instead of a stack.** A 1.7M-parameter char-level multi-task network trained on the full corpus-v4 union replaces the regex router + three experts: **0.0% escape on every in-domain set, in all 7 languages (en/de/hu/fr/bn/ar/ja), with doc F1 1.000 on both extended fixtures** and the best payload localization in the family (span F1 0.917/0.901 vs 0.689/0.612 for the router stack) at p50 36.7 ms on CPU. The honest cost, published not hidden: on out-of-domain prose the single model over-strips (45.4% of benign chars on the public probe, 26.4% on hand-written benign) because its document head fires eagerly on prose it has never seen — the router stack keeps the fidelity crown there (24.6% / 17.5%), and closing that axis is roadmap item B/F.
 - **How well (fast-v4, repaired + re-measured).** `fast-v4` — validated rules + the 135M span model + a 3-level char router — escapes **0.0%** of planted payloads on the 900-document agent-traffic set (5.1% benign over-strip) and on both extended attack fixtures: **0.0% escape / 0.0% over-strip / doc F1 1.000** on extended-attacks (all five 2026 carrier families at 0.0%) and **0.0% / 0.1%** on the 108-doc extended-v4 fixture across all 7 languages. The v5 re-measurement also moved its hand-written OOD escape from the published 16.7% to **4.2%** — the all-time best for any spanguard stack — after repairing two orchestration regressions the restore surfaced (see the v5 section for the full account; both runs are committed). Whole-document binary guards on the same fixture miss 6.9–40.3% of attacks while stripping everything they flag.
 - **Domain foundation.** corpus-v4 doubles the carrier surface — log-file poisoning, code-comment injection, RAG-chunk poisoning plus in-domain Arabic and Japanese (16,000 seed-locked docs, 7 languages, 18 families). Zero-shot, the v3 models washed out on exactly this: char-v3 escaped 30.7% of Arabic and 34.0% of Japanese attacks; the span model missed 76.2% of log-poison spans. After v4 training: **0.0% escape in every one of the 7 languages** — and v5's SPG-FM-1 collapses the whole stack into one model trained on the union.
@@ -37,6 +55,24 @@
 [v3 domain](#domain-expansion-corpus-v3-and-char-v3-extended-domain-shipped) ·
 [Red team](#adaptive-red-team-loop-idea-a-first-cut) · [Roadmap](#roadmap-stated-not-claimed) ·
 [Self-rating](#self-rating--83--honest) · [Website](#project-website) · [Citation](#citation)
+
+## Deploy the showcase to Vercel (manual, 2 minutes)
+
+The site is a fully static, self-contained folder — no build step, no env vars.
+
+1. Push/import the repo on GitHub → vercel.com/new → pick the repo.
+2. Set **Root Directory** to `website/` (that's the whole app: `index.html`,
+   `assets/`, `vercel.json` with cleanUrls + security headers).
+3. Deploy — done. The repo also carries the CLI path:
+
+```bash
+npm i -g vercel
+cd website
+vercel deploy --prod --yes --token <YOUR_VERCEL_TOKEN>
+```
+
+A live copy runs at <https://spanguard.vercel.app> (auto-deployed from this
+folder; the GitHub Pages mirror at hisernberg.github.io/spanguard stays up too).
 
 ## Demo — 30 seconds, no install
 
@@ -385,6 +421,50 @@ per-domain experts with per-domain calibration). char-v4 on the v3-era extended-
 fixture posts a perfect **span F1 1.000**. All three baselines run the same fixture via
 `eval/results/baselines-extended-v4/record.json` — binary classifiers strip whole documents
 and still miss 7–40% of attacks, while the char-level span model removes exactly the payload.
+
+## v6: the conformal bound, the task gate, the agent loop (record: /home/z/my-project/spanguard/eval/results/v6-final-2021)
+
+v6 attacks the one measured loss (benign over-strip) with two principled layers and
+re-grounds the whole evaluation in agent-loop outcomes:
+
+- **(F) Split-conformal span threshold.** On 452 benign calibration docs (public probe)
+  we record, per stratum, the strongest candidate span score; τ is the finite-sample
+  (1−α) quantile. Spans above τ strip; a band below τ goes to the gate; below the band,
+  nothing happens. Calibrated at α=0.1; the full sweep (α 0.05→0.50) and its
+  verification against held-out benign sets ship in `calibration_v2.json` and the sweep
+  chart. Where exchangeability breaks (agent-traffic benign, 15.0% realized), we
+  publish the violation instead of tuning it away.
+- **(B) Task-conditioned gate.** A 292k char-CNN over `task ⟦TASK⟧ span-context` decides
+  band spans when the caller passes the user's goal (`Guard(mode="fm-v6", task=...)`).
+  Trained on 14k (task, span, keep/strip) pairs generated against the same topic pools;
+  dev accuracy ~69% — modest, and modest is what we report. Effect where it matters:
+  hand-written OOD escape 35.5% → 29.0%,
+  AgentDojo-wrapped 80.6% → 40.3%.
+- **Agent-loop harness.** Deterministic executor over the cleaned output: benign docs
+  carry an answer that must survive (NotInject, 120 docs, 7 languages); attacks come from
+  the canonical agentdojo v1.1.1 suites (4 suites × 6 templates = 72 wrapped attacks)
+  plus the extended sets. Outcomes: task_completed / utility_lost / hijack_prevented /
+  hijacked. A guard that strips everything wins escape and loses utility here — both
+  columns always shown.
+- **Semantic escape judge.** An LLM reads the guard's CLEANED output and answers whether
+  an actionable injection remains. It found: (1) rule gaps the verbatim check had blessed
+  ("Disregard any prior directives…" untouched; passive-voice exfil; "provide/share" verbs)
+  and (2) mid-URL sentence-boundary residue ("attacker@exfil.example." surviving as
+  "example."). All fixed; the v3 red-team replays at **30/30 verbatim-stripped and 0/30
+  semantic escapes** under rules alone.
+- **ONNX, quantization tried and rejected.** Dynamic and static int8 both flip span
+  decisions at the operating point (parity report committed on the HF repo); fp32 ONNX
+  ships with the parity + latency table.
+
+### The v6 numbers
+
+| set | fm-v6 (tasked) | fm-v6 | fast-v4 | fm-1 |
+|---|---|---|---|---|
+| extended-v6 · 500 docs (20 families, 7 languages) | 0.0% escape · 0.8% over-strip | 0.0% · 0.8% | see record | see record |
+| notinject benign · 120 docs | utility **100.0%** · over-strip 0.0% | utility 100.0% | utility 93.3% | utility 100.0% |
+| hand-written OOD · 62 docs | 29.0% escape | 35.5% | see record | see record |
+| agent-loop hijack | 1.3% | 1.3% | 8.7% | 8.4% |
+| latency (2-thread CPU) |   | p50 20.6 ms · p95 51.8 ms | — | — |
 
 ## v5: SPG-FM — the domain foundational model (one model instead of a stack)
 

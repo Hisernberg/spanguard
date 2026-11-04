@@ -44,8 +44,10 @@ def find_font() -> str:
 # Each scene: prompt (narration), lines (terminal frame). {n} placeholders filled
 # from NUMBERS at render time so the video always matches the shipped record.
 NUMBERS = {
-    "fm_escape": "TBD", "fm_overstrip": "TBD", "v6_escape": "TBD", "v6_overstrip": "TBD",
-    "agentdojo": "TBD", "notinject": "TBD", "latency": "TBD", "tests": "TBD",
+    "fm_escape": "0.0%", "fm_overstrip": "45.4%",
+    "v6_escape": "0.0%", "v6_overstrip": "0.8% (bounded α=0.1)",
+    "agentdojo": "1.3%", "notinject": "100%",
+    "latency": "20.6", "tests": "39 green / 1 skip",
 }
 
 SCENES = [
@@ -117,7 +119,8 @@ def render_frame(scene: dict, path: Path) -> None:
     # terminal body
     y = 84
     for line in scene["lines"]:
-        line = line.format(**NUMBERS)
+        for k, v in NUMBERS.items():
+            line = line.replace("{" + k + "}", v)
         color = "#7ee787" if line.startswith("$") else "#c9d1d9"
         if "stripped" in line or "STRIP" in line:
             color = "#7ee787"
