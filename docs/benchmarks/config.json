@@ -81,6 +81,15 @@
   ],
   "systems": [
     {
+      "tag": "spg-fm",
+      "label": "SPG-FM-1 (domain foundational model \u2014 one model, no router)",
+      "short": "SPG-FM-1",
+      "color": "#6d28d9",
+      "color_dark": "#a78bfa",
+      "cost_usd_per_1m_docs": 0,
+      "required": true
+    },
+    {
       "tag": "spanguard-fast-v4",
       "label": "spanguard fast-v4 (rules + span-v2 + 3-level char router)",
       "short": "SG fast-v4",

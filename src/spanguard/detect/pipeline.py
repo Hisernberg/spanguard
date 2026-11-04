@@ -27,7 +27,7 @@ class Guard:
 
     def __init__(self, mode: str = "fast", model_id: str | None = None, threshold: float = 0.5,
                  typed_markers: bool = True):
-        if mode not in {"rules", "fast", "fast-v2", "fast-v3", "fast-v4", "audit"}:
+        if mode not in {"rules", "fast", "fast-v2", "fast-v3", "fast-v4", "fm", "audit"}:
             raise ValueError(f"unknown mode {mode!r}")
         self.mode = mode
         self.threshold = threshold
@@ -61,10 +61,10 @@ class Guard:
         t0 = time.monotonic()
         spans = rules_mod.detect_rules(text)
         model_spans_kept: list = []
-        if self.mode in {"fast", "fast-v2", "fast-v3", "fast-v4", "audit"}:
+        if self.mode in {"fast", "fast-v2", "fast-v3", "fast-v4", "fm", "audit"}:
             try:
                 model_spans = self.model.spans(text, threshold=self.threshold)
-                if self.mode in {"fast-v2", "fast-v3", "fast-v4"} and not is_structured(text):
+                if self.mode in {"fast-v2", "fast-v3", "fast-v4", "fm"} and not is_structured(text):
                     model_spans = [s for s in model_spans if s.confidence >= _PROSE_HIGH_CONF]
                 if self.mode in {"fast-v2", "fast-v3", "fast-v4"}:
                     model_spans_kept = model_spans  # ensemble decides below
@@ -73,10 +73,13 @@ class Guard:
             except ImportError:
                 if "model:torch-not-installed" not in self.degraded:
                     self.degraded.append("model:torch-not-installed")  # visible in /healthz
-        if self.mode in {"fast-v2", "fast-v3", "fast-v4"}:
+        if self.mode in {"fast-v2", "fast-v3", "fast-v4", "fm"}:
             try:
                 thr = self.char_threshold(text)
-                if self.mode == "fast-v3":
+                if self.mode == "fm":
+                    from .router import fm_char_spans
+                    char_spans, _, _route = fm_char_spans(text, threshold=thr)
+                elif self.mode == "fast-v3":
                     from .router import routed_char_spans
                     char_spans, _, _route = routed_char_spans(text, threshold=thr)
                 elif self.mode == "fast-v4":
@@ -86,10 +89,10 @@ class Guard:
                     char_spans, _ = self.char_model(text, threshold=thr)
                 self._char_ok = True
                 prose = not is_structured(text)
-                if self.mode in {"fast-v3", "fast-v4"}:
+                if self.mode in {"fast-v3", "fast-v4", "fm"}:
                     from .router import is_extended_domain, route_v4
                     routed = (is_extended_domain(text) if self.mode == "fast-v3"
-                              else route_v4(text) in {"v3", "v4"})
+                              else route_v4(text) in {"v3", "v4"} if self.mode == "fast-v4" else True)
                     if routed:
                         prose = False  # routed docs trust the in-domain char model (union)
                 if prose:
@@ -138,7 +141,9 @@ class Guard:
 
             from .char_guard import _load
 
-            if self.mode == "fast-v3":
+            if self.mode == "fm":
+                dir_path = os.environ.get("SPANGUARD_FM_MODEL")
+            elif self.mode == "fast-v3":
                 from .router import is_extended_domain
 
                 dir_path = (os.environ.get("SPANGUARD_CHAR_MODEL_V3")
@@ -151,12 +156,12 @@ class Guard:
                 dir_path = None
             _, _, calib = _load(dir_path)
             base = calib.get("threshold", 0.5)
-            if self.mode in {"fast-v3", "fast-v4"}:
+            if self.mode in {"fast-v3", "fast-v4", "fm"}:
                 from .router import is_extended_domain, route_v4
                 # prose bump protects against neural FPs on out-of-domain prose;
                 # routed (in-domain) docs use the routed model's own calibration
                 routed = (is_extended_domain(text) if self.mode == "fast-v3"
-                          else route_v4(text) in {"v3", "v4"})
+                          else route_v4(text) in {"v3", "v4"} if self.mode == "fast-v4" else True)
                 bump = 0.0 if routed else (_PROSE_CHAR_BUMP if not is_structured(text) else 0.0)
                 return base + bump
             return base + (_PROSE_CHAR_BUMP if not is_structured(text) else 0.0)
@@ -173,9 +178,10 @@ class Guard:
         d = ["rules"]
         if self.mode in {"fast", "fast-v2", "audit"} and self._model_ok:
             d.append("model")
-        if self.mode in {"fast-v2", "fast-v3", "fast-v4"} and self._char_ok:
+        if self.mode in {"fast-v2", "fast-v3", "fast-v4", "fm"} and self._char_ok:
             d.append("char" if self.mode == "fast-v2"
-                     else "char-router(v2+v3)" if self.mode == "fast-v3" else "char-router(v2+v3+v4)")
+                     else "char-router(v2+v3)" if self.mode == "fast-v3"
+                     else "char-router(v2+v3+v4)" if self.mode == "fast-v4" else "spg-fm-1")
         if self.mode == "audit" and self._model_ok:
             d.append("audit")
         return d

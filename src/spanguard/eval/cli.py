@@ -153,6 +153,20 @@ def run_eval(systems: list[str], sets: list[str], tag: str | None = None, limit:
             except Exception as exc:  # noqa: BLE001
                 print(f"skip spanguard-fast-v3: {exc}")
                 continue
+        elif sysname == "spanguard-char-v4":
+            try:
+                from ..detect.char_guard import char_guard_system
+
+                fn = char_guard_system(model_dir=str(REPO / "data" / "models" / "spanguard-char-v4"))
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spanguard-char-v4: {exc}")
+                continue
+        elif sysname == "spg-fm":
+            try:
+                fn = guard_system("fm")
+            except Exception as exc:  # noqa: BLE001
+                print(f"skip spg-fm: {exc}")
+                continue
         elif sysname == "spanguard-fast-v4":
             try:
                 fn = guard_system("fast-v4")

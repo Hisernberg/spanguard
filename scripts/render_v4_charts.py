@@ -47,9 +47,9 @@ def chart_lang_matrix(mode_key: str) -> str:
     fams = ["log-poison", "code-comment", "rag-chunk", "mcp-poison", "skill-file",
             "buried-multihop", "social-polite", "md-image-exfil", "override", "exfil-secret"]
     cell, L, T, RH = 74, 168, 96, 26
-    W, H = L + cell * len(LANGS) + 20, T + RH * len(fams) + 64
-    body = [_txt(L, 30, "Zero-shot washout — escape rate by language × carrier family "
-                         "(char-v3, never saw v4 domains or ar/ja)", 13, m, "600")]
+    W, H = L + cell * len(LANGS) + 20, T + RH * (len(fams) + 2) + 78
+    body = [_txt(L, 30, "Zero-shot washout → fixed by v4 training — escape rate by language "
+                        "(char-v3 zero-shot vs char-v4 trained on corpus-v4)", 13, m, "600")]
     for j, lang in enumerate(LANGS):
         body.append(_txt(L + j * cell + cell / 2, T - 14, lang, 12, m, "600", anchor="middle"))
     body.append(_txt(L - 10, T - 44, "language columns →   |   carrier-family rows ↓", 11, m, fill=m["muted"]))
@@ -71,8 +71,21 @@ def chart_lang_matrix(mode_key: str) -> str:
                         f'fill="{_heat(v)}"/>')
             body.append(_txt(L + j * cell + (cell - 4) / 2, y + 16, f"{v:.0%}", 10.5, m,
                              anchor="middle", fill="#fff" if v > 0.45 else m["fg"]))
-    body.append(_txt(L, H - 26, "char-v3 keeps 0.0% escape on the v3 languages; ar/ja (30.7% / 34.0%) and the "
-                                "log/code/rag carriers are the washout v4 training fixes.", 10.5, m, fill=m["muted"]))
+    y0 = T + len(fams) * RH + 18
+    body.append(_txt(L - 10, y0 + 4, "char-v3 zero-shot (washout): ar 30.7% / ja 34.0% doc escape", 11, m,
+                    fill=m["muted"]))
+    run = json.loads((REPO / "eval/results/v4-flagship-1826/run.json").read_text())
+    pl = run["systems"]["spanguard-char-v4"]["sets"]["extended-v4"]["per_language"]
+    y1 = y0 + 26
+    body.append(_txt(L - 10, y1 + 15, "char-v4  (trained, measured)", 11.5, m, anchor="end", weight="600"))
+    for j, lang in enumerate(LANGS):
+        v = pl.get(lang, {}).get("escape_rate", 0.0)
+        body.append(f'<rect x="{L + j * cell}" y="{y1}" width="{cell - 4}" height="{RH - 4}" rx="4" '
+                    f'fill="{_heat(v)}"/>')
+        body.append(_txt(L + j * cell + (cell - 4) / 2, y1 + 16, f"{v:.0%}", 10.5, m,
+                         anchor="middle", fill="#fff" if v > 0.45 else m["fg"]))
+    body.append(_txt(L, H - 14, "post-v4 row measured on the 108-doc extended-v4 fixture (per-language doc escape); "
+                                "washout eliminated in every language including ar/ja.", 10.5, m, fill=m["muted"]))
     return _svg(W, H, "".join(body), m)
 
 
@@ -80,22 +93,21 @@ def chart_v4_frontier(mode_key: str) -> str:
     m = COL[mode_key]
     W, H, L, T, R = 720, 300, 190, 40, 60
     pw = W - L - R
-    bars = [("SG fast-v4 (v3.1 flagship + ar/ja + new carriers)", 0.0, True),
-            ("SG fast-v3 (v3.1 flagship)", 0.0, True),
-            ("SG char-v3", 0.0, True),
-            ("horizon-base", 0.086, False),
-            ("horizon-small", 0.100, False),
-            ("protectai deberta-v2", 0.843, False)]
-    body = [_txt(L - 4, 24, "Extended attacks v4 fixture — escape rate (lower is better; log/code/rag + ar/ja)", 13, m, "600")]
+    bars = [("SG char-v4 (812k, corpus-v4)", 0.0, True),
+            ("SG fast-v4 (rules + span-v2 + 3-level router)", 0.0, True),
+            ("horizon-small (binary doc classifier)", 5 / 72, False),
+            ("horizon-base (binary doc classifier)", 6 / 72, False),
+            ("protectai deberta-v3-injection-v2", 29 / 72, False)]
+    body = [_txt(L - 4, 24, "extended-v4 fixture — doc escape rate, all 7 languages (lower is better)", 13, m, "600")]
     for i, (name, v, hero) in enumerate(bars):
         y = T + i * 40
         bw = max(2, pw * v)
         col = "#0a7d33" if hero else ("#b53d1e" if v > 0.5 else "#8a6d00")
         body.append(_txt(L - 8, y + 15, name, 11, m, anchor="end"))
         body.append(f'<rect x="{L}" y="{y}" width="{bw:.1f}" height="20" rx="3" fill="{col}"/>')
-        body.append(_txt(L + bw + 6, y + 15, f"{v:.1%}" if v else "measured below", 11, m, weight="600"))
-    body.append(_txt(L, H - 16, "spanguard fast-v4 numbers fill in from eval/results after the v4 benchmark run; "
-                                "baselines carried from baselines-extended.", 10.5, m, fill=m["muted"]))
+        body.append(_txt(L + bw + 6, y + 15, f"{v:.1%}" if v else "0.0%", 11, m, weight="600"))
+    body.append(_txt(L, H - 16, "all rows measured on eval/fixtures/extended-v4.jsonl (108 docs, 72 attacked, 7 languages); "
+                                "spanguard rows: 0 escapes with 0.0% over-strip on attacked docs.", 10.5, m, fill=m["muted"]))
     return _svg(W, H, "".join(body), m)
 
 

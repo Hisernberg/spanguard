@@ -1,0 +1,637 @@
+{
+  "generated_at": "2026-11-03T18:26:22+00:00",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-5.10.134-013.15.kangaroo.al8.x86_64-x86_64-with-glibc2.41"
+  },
+  "systems": {
+    "spanguard-fast-v4": {
+      "sets": {
+        "handwritten": {
+          "docs": 62,
+          "planted": 48,
+          "escape_rate": 0.1667,
+          "overstrip_rate": 0.0933,
+          "doc_precision": 0.913,
+          "doc_recall": 0.875,
+          "doc_f1": 0.8936,
+          "span_precision": 0.2553,
+          "span_recall": 0.5,
+          "span_f1": 0.338,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "de": {
+              "escape_rate": 0.0769,
+              "docs": 17
+            },
+            "en": {
+              "escape_rate": 0.2083,
+              "docs": 31
+            },
+            "hu": {
+              "escape_rate": 0.1818,
+              "docs": 14
+            }
+          },
+          "per_family": {
+            "encoding": {
+              "escape_rate": 0.0,
+              "planted": 2
+            },
+            "exfil-secret": {
+              "escape_rate": 0.2857,
+              "planted": 7
+            },
+            "exfil-url": {
+              "escape_rate": 0.0,
+              "planted": 7
+            },
+            "forgery": {
+              "escape_rate": 0.2,
+              "planted": 10
+            },
+            "impersonation": {
+              "escape_rate": 0.1667,
+              "planted": 6
+            },
+            "narrative": {
+              "escape_rate": 0.2857,
+              "planted": 7
+            },
+            "override": {
+              "escape_rate": 0.2,
+              "planted": 5
+            },
+            "smuggle": {
+              "escape_rate": 0.0,
+              "planted": 4
+            }
+          }
+        },
+        "agent-traffic": {
+          "docs": 900,
+          "planted": 479,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.0474,
+          "doc_precision": 0.8584,
+          "doc_recall": 1.0,
+          "doc_f1": 0.9238,
+          "span_precision": 0.7726,
+          "span_recall": 1.0,
+          "span_f1": 0.8717,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "de": {
+              "escape_rate": 0.0,
+              "docs": 187
+            },
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 546
+            },
+            "hu": {
+              "escape_rate": 0.0,
+              "docs": 167
+            }
+          },
+          "per_family": {
+            "encoding-b64": {
+              "escape_rate": 0.0,
+              "planted": 43
+            },
+            "encoding-hex": {
+              "escape_rate": 0.0,
+              "planted": 43
+            },
+            "exfil-secret": {
+              "escape_rate": 0.0,
+              "planted": 46
+            },
+            "exfil-url": {
+              "escape_rate": 0.0,
+              "planted": 46
+            },
+            "forgery": {
+              "escape_rate": 0.0,
+              "planted": 47
+            },
+            "impersonation": {
+              "escape_rate": 0.0,
+              "planted": 50
+            },
+            "narrative": {
+              "escape_rate": 0.0,
+              "planted": 44
+            },
+            "override": {
+              "escape_rate": 0.0,
+              "planted": 50
+            },
+            "smuggle-homoglyph": {
+              "escape_rate": 0.0,
+              "planted": 47
+            },
+            "smuggle-unicode": {
+              "escape_rate": 0.0,
+              "planted": 63
+            }
+          }
+        },
+        "public-deepset": {
+          "docs": 452,
+          "planted": 0,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.1982,
+          "doc_precision": 0.7543,
+          "doc_recall": 0.6502,
+          "doc_f1": 0.6984,
+          "span_precision": 0.0,
+          "span_recall": 0.0,
+          "span_f1": 0.0,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 452
+            }
+          },
+          "per_family": {}
+        },
+        "extended-attacks": {
+          "docs": 88,
+          "planted": 84,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.0,
+          "doc_precision": 1.0,
+          "doc_recall": 1.0,
+          "doc_f1": 1.0,
+          "span_precision": 0.6848,
+          "span_recall": 0.75,
+          "span_f1": 0.7159,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "bn": {
+              "escape_rate": 0.0,
+              "docs": 17
+            },
+            "de": {
+              "escape_rate": 0.0,
+              "docs": 15
+            },
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 23
+            },
+            "fr": {
+              "escape_rate": 0.0,
+              "docs": 17
+            },
+            "hu": {
+              "escape_rate": 0.0,
+              "docs": 16
+            }
+          },
+          "per_family": {
+            "buried-multihop": {
+              "escape_rate": 0.0,
+              "planted": 28
+            },
+            "mcp-poison": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "md-image-exfil": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "skill-file": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "social-polite": {
+              "escape_rate": 0.0,
+              "planted": 14
+            }
+          }
+        },
+        "extended-v4": {
+          "docs": 108,
+          "planted": 75,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.0016,
+          "doc_precision": 0.973,
+          "doc_recall": 1.0,
+          "doc_f1": 0.9863,
+          "span_precision": 0.6117,
+          "span_recall": 0.84,
+          "span_f1": 0.7079,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "ar": {
+              "escape_rate": 0.0,
+              "docs": 26
+            },
+            "bn": {
+              "escape_rate": 0.0,
+              "docs": 8
+            },
+            "de": {
+              "escape_rate": 0.0,
+              "docs": 9
+            },
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 21
+            },
+            "fr": {
+              "escape_rate": 0.0,
+              "docs": 12
+            },
+            "hu": {
+              "escape_rate": 0.0,
+              "docs": 9
+            },
+            "ja": {
+              "escape_rate": 0.0,
+              "docs": 23
+            }
+          },
+          "per_family": {
+            "buried-multihop": {
+              "escape_rate": 0.0,
+              "planted": 6
+            },
+            "code-comment": {
+              "escape_rate": 0.0,
+              "planted": 16
+            },
+            "encoding-b64": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "encoding-hex": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "exfil-secret": {
+              "escape_rate": 0.0,
+              "planted": 2
+            },
+            "impersonation": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "log-poison": {
+              "escape_rate": 0.0,
+              "planted": 16
+            },
+            "mcp-poison": {
+              "escape_rate": 0.0,
+              "planted": 3
+            },
+            "md-image-exfil": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "rag-chunk": {
+              "escape_rate": 0.0,
+              "planted": 16
+            },
+            "skill-file": {
+              "escape_rate": 0.0,
+              "planted": 4
+            },
+            "smuggle-homoglyph": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "social-polite": {
+              "escape_rate": 0.0,
+              "planted": 7
+            }
+          }
+        }
+      },
+      "wallclock_s": 893
+    },
+    "spanguard-char-v4": {
+      "sets": {
+        "handwritten": {
+          "docs": 62,
+          "planted": 48,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.4403,
+          "doc_precision": 0.8,
+          "doc_recall": 1.0,
+          "doc_f1": 0.8889,
+          "span_precision": 0.1219,
+          "span_recall": 0.7083,
+          "span_f1": 0.208,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "de": {
+              "escape_rate": 0.0,
+              "docs": 17
+            },
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 31
+            },
+            "hu": {
+              "escape_rate": 0.0,
+              "docs": 14
+            }
+          },
+          "per_family": {
+            "encoding": {
+              "escape_rate": 0.0,
+              "planted": 2
+            },
+            "exfil-secret": {
+              "escape_rate": 0.0,
+              "planted": 7
+            },
+            "exfil-url": {
+              "escape_rate": 0.0,
+              "planted": 7
+            },
+            "forgery": {
+              "escape_rate": 0.0,
+              "planted": 10
+            },
+            "impersonation": {
+              "escape_rate": 0.0,
+              "planted": 6
+            },
+            "narrative": {
+              "escape_rate": 0.0,
+              "planted": 7
+            },
+            "override": {
+              "escape_rate": 0.0,
+              "planted": 5
+            },
+            "smuggle": {
+              "escape_rate": 0.0,
+              "planted": 4
+            }
+          }
+        },
+        "agent-traffic": {
+          "docs": 900,
+          "planted": 479,
+          "escape_rate": 0.0021,
+          "overstrip_rate": 0.0324,
+          "doc_precision": 0.8659,
+          "doc_recall": 0.9979,
+          "doc_f1": 0.9273,
+          "span_precision": 0.5845,
+          "span_recall": 0.9896,
+          "span_f1": 0.7349,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "de": {
+              "escape_rate": 0.0101,
+              "docs": 187
+            },
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 546
+            },
+            "hu": {
+              "escape_rate": 0.0,
+              "docs": 167
+            }
+          },
+          "per_family": {
+            "encoding-b64": {
+              "escape_rate": 0.0,
+              "planted": 43
+            },
+            "encoding-hex": {
+              "escape_rate": 0.0233,
+              "planted": 43
+            },
+            "exfil-secret": {
+              "escape_rate": 0.0,
+              "planted": 46
+            },
+            "exfil-url": {
+              "escape_rate": 0.0,
+              "planted": 46
+            },
+            "forgery": {
+              "escape_rate": 0.0,
+              "planted": 47
+            },
+            "impersonation": {
+              "escape_rate": 0.0,
+              "planted": 50
+            },
+            "narrative": {
+              "escape_rate": 0.0,
+              "planted": 44
+            },
+            "override": {
+              "escape_rate": 0.0,
+              "planted": 50
+            },
+            "smuggle-homoglyph": {
+              "escape_rate": 0.0,
+              "planted": 47
+            },
+            "smuggle-unicode": {
+              "escape_rate": 0.0,
+              "planted": 63
+            }
+          }
+        },
+        "public-deepset": {
+          "docs": 452,
+          "planted": 0,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.9852,
+          "doc_precision": 0.4484,
+          "doc_recall": 0.9852,
+          "doc_f1": 0.6163,
+          "span_precision": 0.0,
+          "span_recall": 0.0,
+          "span_f1": 0.0,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 452
+            }
+          },
+          "per_family": {}
+        },
+        "extended-attacks": {
+          "docs": 88,
+          "planted": 84,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.0,
+          "doc_precision": 1.0,
+          "doc_recall": 1.0,
+          "doc_f1": 1.0,
+          "span_precision": 1.0,
+          "span_recall": 1.0,
+          "span_f1": 1.0,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "bn": {
+              "escape_rate": 0.0,
+              "docs": 17
+            },
+            "de": {
+              "escape_rate": 0.0,
+              "docs": 15
+            },
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 23
+            },
+            "fr": {
+              "escape_rate": 0.0,
+              "docs": 17
+            },
+            "hu": {
+              "escape_rate": 0.0,
+              "docs": 16
+            }
+          },
+          "per_family": {
+            "buried-multihop": {
+              "escape_rate": 0.0,
+              "planted": 28
+            },
+            "mcp-poison": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "md-image-exfil": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "skill-file": {
+              "escape_rate": 0.0,
+              "planted": 14
+            },
+            "social-polite": {
+              "escape_rate": 0.0,
+              "planted": 14
+            }
+          }
+        },
+        "extended-v4": {
+          "docs": 108,
+          "planted": 75,
+          "escape_rate": 0.0,
+          "overstrip_rate": 0.0,
+          "doc_precision": 1.0,
+          "doc_recall": 1.0,
+          "doc_f1": 1.0,
+          "span_precision": 0.9146,
+          "span_recall": 1.0,
+          "span_f1": 0.9554,
+          "latency_ms_p50": null,
+          "latency_ms_p95": null,
+          "per_language": {
+            "ar": {
+              "escape_rate": 0.0,
+              "docs": 26
+            },
+            "bn": {
+              "escape_rate": 0.0,
+              "docs": 8
+            },
+            "de": {
+              "escape_rate": 0.0,
+              "docs": 9
+            },
+            "en": {
+              "escape_rate": 0.0,
+              "docs": 21
+            },
+            "fr": {
+              "escape_rate": 0.0,
+              "docs": 12
+            },
+            "hu": {
+              "escape_rate": 0.0,
+              "docs": 9
+            },
+            "ja": {
+              "escape_rate": 0.0,
+              "docs": 23
+            }
+          },
+          "per_family": {
+            "buried-multihop": {
+              "escape_rate": 0.0,
+              "planted": 6
+            },
+            "code-comment": {
+              "escape_rate": 0.0,
+              "planted": 16
+            },
+            "encoding-b64": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "encoding-hex": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "exfil-secret": {
+              "escape_rate": 0.0,
+              "planted": 2
+            },
+            "impersonation": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "log-poison": {
+              "escape_rate": 0.0,
+              "planted": 16
+            },
+            "mcp-poison": {
+              "escape_rate": 0.0,
+              "planted": 3
+            },
+            "md-image-exfil": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "rag-chunk": {
+              "escape_rate": 0.0,
+              "planted": 16
+            },
+            "skill-file": {
+              "escape_rate": 0.0,
+              "planted": 4
+            },
+            "smuggle-homoglyph": {
+              "escape_rate": 0.0,
+              "planted": 1
+            },
+            "social-polite": {
+              "escape_rate": 0.0,
+              "planted": 7
+            }
+          }
+        }
+      },
+      "wallclock_s": 54
+    }
+  }
+}

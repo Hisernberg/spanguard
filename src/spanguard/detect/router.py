@@ -147,3 +147,15 @@ def routed_char_spans_v4(text: str, threshold: float | None = None):
     model = dirs[level] or dirs["v2"]
     spans, doc_p = char_spans(text, dir_path=model, threshold=threshold)
     return spans, doc_p, f"spanguard-char-router:{level}"
+
+
+def fm_char_spans(text: str, threshold: float | None = None):
+    """SPG-FM path: one foundational model for every domain — no routing.
+    Model dir from env SPANGUARD_FM_MODEL (falls back to the v2 char model)."""
+    import os
+
+    from .char_guard import char_spans
+
+    model = os.environ.get("SPANGUARD_FM_MODEL") or os.environ.get("SPANGUARD_CHAR_MODEL")
+    spans, doc_p = char_spans(text, dir_path=model, threshold=threshold)
+    return spans, doc_p, "spg-fm-1"
