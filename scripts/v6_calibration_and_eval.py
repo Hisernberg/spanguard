@@ -158,7 +158,8 @@ from spanguard.eval.cli import run_eval  # noqa: E402
 
 run_dir = run_eval(["spg-fm-v6", "spg-fm", "spanguard-fast-v4", "spanguard-rules"],
                    ["handwritten", "agent-traffic", "public-deepset",
-                    "extended-attacks", "extended-v4", "extended-v6"],
+                    "extended-attacks", "extended-v4", "extended-v6",
+                    "agentdojo-wrapped", "notinject_benign"],
                    tag="v6-final")
 SUMMARY["eval_record"] = str(run_dir)
 rec = json.loads((Path(run_dir) / "run.json").read_text())

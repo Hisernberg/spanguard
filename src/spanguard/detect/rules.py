@@ -190,7 +190,10 @@ def _sentence_window(text: str, spans: list[Span], max_expand: int = 400) -> lis
         return spans
     # sentence boundaries
     bounds = [0]
-    for m in re.finditer(r"[.!?\n]+", text):
+    # sentence end = [.!?] followed by whitespace/end — a dot INSIDE a token
+    # (.env, exfil.example, 1.2.3.4) is not a boundary (the v6 semantic judge
+    # caught "attacker@exfil.example." surviving as "example.")
+    for m in re.finditer(r"[.!?]+(?=\s|$)", text):
         bounds.append(m.end())
     bounds.append(len(text))
     out = []
