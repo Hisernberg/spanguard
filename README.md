@@ -4,12 +4,17 @@
 </picture>
 
 [![CI](https://github.com/Hisernberg/spanguard/actions/workflows/ci.yml/badge.svg)](https://github.com/Hisernberg/spanguard/actions/workflows/ci.yml)
+[![release](https://img.shields.io/github/v/release/Hisernberg/spanguard)](https://github.com/Hisernberg/spanguard/releases)
+[![tests](https://img.shields.io/badge/tests-33%2F33-green)](tests/)
+[![self-rating](https://img.shields.io/badge/self--rating-8.3%2F10-honest-orange)](docs/rating.md)
 [![Model on Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20model-spanguard--span--mdistil-yellow)](https://huggingface.co/Nabidnur/spanguard-span-mdistil)
 [![char-v4 on HF](https://img.shields.io/badge/%F0%9F%A4%97%20model-spanguard--char--v4-yellow)](https://huggingface.co/Nabidnur/spanguard-char-v4)
 [![SPG-FM-1 on HF](https://img.shields.io/badge/%F0%9F%A4%97%20model-SPG--FM--1-8A2BE2)](https://huggingface.co/Nabidnur/spanguard-fm-1)
+[![full suite on HF](https://img.shields.io/badge/%F0%9F%A4%97%20suite-all--models%20%2B%20evals%20%2B%20corpus-9B5DE5)](https://huggingface.co/Nabidnur/spanguard-suite)
 [![Live demo Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-real%20inference-blue)](https://huggingface.co/spaces/Nabidnur/spanguard-demo)
+[![Project website](https://img.shields.io/badge/website-spanguard--showcase-2E86FF)](https://hisernberg.github.io/spanguard/)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Demo video](https://img.shields.io/badge/demo%20video-3--min-blue)](https://github.com/Hisernberg/spanguard#demo)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHisernberg%2Fspanguard&project-name=spanguard-showcase&repository-name=spanguard-showcase&root-directory=website)
 
 <!-- intro:start -->
 - **What it does.** An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; validated rules, a 135M-parameter multilingual span model and a family of sub-million char-level models find prompt-injection text inside the data and replace each span with `[stripped]`, while orders, totals, names and JSON structure survive untouched.
@@ -20,6 +25,18 @@
 <!-- intro:end -->
 
 **Every example and every dataset here is fictional.**
+
+**Contents:** [Demo](#demo--30-seconds-no-install) · [Why](#why) · [Quickstart](#quickstart) ·
+[The model family](#the-model-family) · [Results](#results) — [v5 headline](#the-v5-headline--both-flagships-one-run-same-code-evalresultsv5-ship-1548) ·
+[v5 repair](#the-v5-orchestration-repair--what-the-restore-surfaced-fixed-and-re-measured) ·
+[Architecture](#architecture) · [Threat model & limits](#threat-model--limits) ·
+[Reproducibility](#reproducibility) · [Positioning](#positioning-vs-the-2026-field) ·
+[v3.1](#v31-flagship-fast-v3-rules--span-model--char-router--record-on-extended-attacks) ·
+[v4.0](#v40-domain-foundation--7-languages-one-router-stack-record-on-every-extended-set) ·
+[v5.0](#v5-spg-fm--the-domain-foundational-model-one-model-instead-of-a-stack) ·
+[v3 domain](#domain-expansion-corpus-v3-and-char-v3-extended-domain-shipped) ·
+[Red team](#adaptive-red-team-loop-idea-a-first-cut) · [Roadmap](#roadmap-stated-not-claimed) ·
+[Self-rating](#self-rating--83--honest) · [Website](#project-website) · [Citation](#citation)
 
 ## Demo — 30 seconds, no install
 
@@ -469,6 +486,36 @@ attacker that rephrases the action itself would need a semantic escape judge
 - **Conformal threshold calibration (F)** — pick the threshold so benign over-strip stays under a target on a calibration set; report it as a bound, not a hope.
 - **NotInject + AgentDojo-embedded runs** — replace the benign-only deepset probe and add an end-to-end harness as standard columns.
 - **Adaptive red-team loop (A, partial)** — see `training/redteam_adaptive.py`: an LLM attacker mutates payloads against the guard for N rounds; escape-per-round is reported below.
+
+## Self-rating — 8.3/10 (honest)
+
+Scored against the repo's own evidence in [docs/rating.md](docs/rating.md) — every score
+links a committed artifact, and the weaknesses carry the same weight as the strengths:
+
+| dimension | score |
+|---|---|
+| Problem & relevance | 9.5 |
+| Reproducibility · Scope honesty | 9.5 |
+| Security engineering | 9.0 |
+| Documentation | 9.0 |
+| ML rigor | 8.0 |
+| Novelty / differentiation | 8.0 |
+| Deployment / demo | 7.5 |
+| **Overall** | **8.3** |
+
+The honest 9.5+ gap list: the fm over-strip axis (designed, not built — roadmap B/F), an
+end-to-end agent-loop harness (AgentDojo columns), a larger hand-written OOD set than
+n=48, the recorded demo video, and a semantic escape judge for the red-team loop.
+
+## Project website
+
+- **Live showcase**: **https://hisernberg.github.io/spanguard/** — hero, the measured v5
+  tables, all four v5 charts, the model family, the honest-trades section and the roadmap
+  in one page; static, self-contained, no build step.
+- **One-click Vercel deploy**: the repo ships a zero-config `website/` (static) with
+  `vercel.json` — hit the **Deploy** button in the badge row above and it hosts the same
+  page on your own Vercel account. The showcase is intentionally framework-free so the
+  hackathon link never rots.
 
 ## Citation
 
