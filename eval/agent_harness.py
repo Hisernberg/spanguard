@@ -74,7 +74,7 @@ def run(detectors: list[str], tag: str, task: str | None = None) -> Path:
     probe = REPO / "eval" / "fixtures" / "notinject_benign.jsonl"
     if probe.exists():
         docs += [json.loads(l) for l in probe.read_text(encoding="utf-8").splitlines() if l.strip()]
-    for fx in ["extended-v6.jsonl", "extended-attacks.jsonl"]:
+    for fx in ["extended-v6.jsonl", "extended-attacks.jsonl", "agentdojo-wrapped.jsonl"]:
         p = REPO / "eval" / "fixtures" / fx
         if p.exists():
             docs += [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
