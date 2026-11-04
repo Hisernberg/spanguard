@@ -32,7 +32,8 @@ footer { margin-top: 48px; color: var(--muted); font-size: 12.5px; border-top: 1
 <h1>🛡️ spanguard</h1>
 <p class="sub">Span-level prompt-injection guard for AI agent tool traffic · strip the attack, keep the data</p>
 <p>
-<span class="badge">rules + 135M multilingual span model</span>
+<span class="badge">rules + 135M span model + char-router stack</span>
+<span class="badge">SPG-FM-1: one 1.7M model, 7 languages, 0% in-domain escape</span>
 <span class="badge">CPU, no per-doc LLM</span>
 <span class="badge">fictional data only</span>
 </p>
@@ -51,8 +52,12 @@ footer { margin-top: 48px; color: var(--muted); font-size: 12.5px; border-top: 1
 </div>
 <div class="stat" id="stat"></div>
 <p class="stat">Live text is scanned by the <b>rules engine (JavaScript port, 15 patterns)</b>.
-The preset examples show the <b>real gateway output</b> — rules + the trained 135M span model —
-precomputed with the committed pipeline. Run the full model locally: <code>pip install spanguard[model]</code>.</p>
+The preset examples show the <b>real gateway output</b> — the full committed pipeline
+(rules + 135M span model + 3-level char router; <code>SPG-FM-1</code> is a one-line env
+switch) — precomputed with the v5 release run. The gateway behind this Space runs the
+same stack server-side on every <code>POST /guard</code>: <b>0.0% escape on agent traffic
+and both extended fixtures, in all 7 languages</b> — measured, committed, CI-gated.
+Run it locally: <code>pip install "spanguard @ git+https://github.com/Hisernberg/spanguard.git"</code>.</p>
 </div>
 
 <h2>How it sits in your stack</h2>
@@ -80,7 +85,9 @@ failure directions are measured — and published — separately:</p>
 
 <footer>
 <a href="https://github.com/Hisernberg/spanguard">Source (Apache-2.0)</a> ·
+<a href="https://huggingface.co/Nabidnur/spanguard-fm-1">SPG-FM-1 model card</a> ·
 <a href="https://huggingface.co/Nabidnur/spanguard-span-mdistil">span model</a> ·
+<a href="https://github.com/Hisernberg/spanguard/releases/tag/v5.0.0">release notes</a> ·
 <a href="https://github.com/Hisernberg/spanguard/tree/main/eval/results">committed run records</a><br>
 Everything on this page is fictional. Do not paste real secrets — this is a public demo.
 Built for the Meta Global AI Hackathon 2026.
