@@ -15,7 +15,7 @@
 [![Live demo Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-real%20inference-blue)](https://huggingface.co/spaces/Nabidnur/spanguard-demo)
 [![Project website](https://img.shields.io/badge/website-hisernberg.github.io%2Fspanguard-2E86FF)](https://hisernberg.github.io/spanguard/)
 [![live on Vercel](https://img.shields.io/badge/live-spanguard.vercel.app-000?logo=vercel)](https://spanguard.vercel.app)
-[![demo video](https://img.shields.io/badge/demo-video%2084s-red?logo=youtube)](docs/assets/spanguard-demo-v6.mp4)
+[![demo video](https://img.shields.io/badge/demo-video%202%3A54-red?logo=youtube)](docs/assets/spanguard-demo-v6.mp4)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHisernberg%2Fspanguard&project-name=spanguard-showcase&repository-name=spanguard-showcase&root-directory=website)
 
@@ -55,7 +55,8 @@
 [v5.0](#v5-spg-fm--the-domain-foundational-model-one-model-instead-of-a-stack) ·
 [v3 domain](#domain-expansion-corpus-v3-and-char-v3-extended-domain-shipped) ·
 [Red team](#adaptive-red-team-loop-idea-a-first-cut) · [Roadmap](#roadmap-stated-not-claimed) ·
-[Self-rating](#self-rating--91-honest) · [Website & deploy](#project-website--deploy) · [Citation](#citation)
+[Self-rating](#self-rating--91-honest) · [Website & deploy](#project-website--deploy) · [Citation](#citation) ·
+[Full v0→v6 history](CHANGELOG.md)
 
 ## Demo — 30 seconds, no install
 
@@ -68,9 +69,12 @@ languages — or paste your own text: attack spans highlighted per detector, typ
 `[stripped:*]` markers in the cleaned output, findings table with offsets and payload
 hashes, per-run latency. Nothing is hand-rendered; every verdict is a real gateway run. A
 static 15-card visual walkthrough of the same runs ships in the repo:
-[docs/demo/visual-inference.html](docs/demo/visual-inference.html), and the 84-second
-demo video (real gateway runs, TTS narration) is committed at
-[docs/assets/spanguard-demo-v6.mp4](docs/assets/spanguard-demo-v6.mp4).
+[docs/demo/visual-inference.html](docs/demo/visual-inference.html). The **2:54 demo
+video** (8 scenes, real gateway runs, TTS narration, subtitles) is committed at
+[docs/assets/spanguard-demo-v6.mp4](docs/assets/spanguard-demo-v6.mp4) with its SRT —
+chapters: `0:00` the hijack · `0:44` seven languages · `1:12` the bound + the gate ·
+`1:39` agent-loop outcomes · `2:08` the open family. The full YouTube package (SRT/VTT,
+thumbnail, title/description/tags) is in [`docs/yt-package/`](docs/yt-package/).
 
 Prefer a terminal?
 

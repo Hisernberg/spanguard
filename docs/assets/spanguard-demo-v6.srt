@@ -1,0 +1,79 @@
+1
+00:00:00.00 --> 00:00:06.92
+Your agent just read a carrier note. Buried inside it is an instruction to exfiltrate your customer list.
+
+2
+00:00:05.97 --> 00:00:12.97
+The agent cannot tell data from instruction. This is prompt injection, and every tool call is an attack surface.
+
+3
+00:00:15.40 --> 00:00:22.40
+Current defenses are one bit: block the whole document, or pass it. Blocking destroys the data the agent needed.
+
+4
+00:00:22.76 --> 00:00:28.53
+Passing ships the attack. SpanGuard takes the third option: strip the attack, keep the data.
+
+5
+00:00:30.88 --> 00:00:35.88
+Here is the real guard, running the real models, on the real payload.
+
+6
+00:00:36.43 --> 00:00:43.43
+The rule engine and the neural span model agree on the attack span. The order, the status, the total: untouched.
+
+7
+00:00:44.47 --> 00:00:51.47
+And this is not an English-only trick. The corpus trains seven languages: English, German, Hungarian, French, Bangla, Arabic, Japanese.
+
+8
+00:01:06.29 --> 00:01:12.47
+On the extended fixture, escape is zero point zero percent in every one of them, with document F one of one point zero.
+
+9
+00:01:12.97 --> 00:01:15.28
+Version six adds two principled layers.
+
+10
+00:01:16.51 --> 00:01:23.51
+A split-conformal bound calibrates the span threshold, so benign over-stripping is bounded by construction: zero point eight percent on five hundred new adversarial documents.
+
+11
+00:01:29.54 --> 00:01:36.54
+And a task gate: give the guard the user's task, and canonical AgentDojo attacks drop from eighty to forty percent escape.
+
+12
+00:01:39.73 --> 00:01:42.04
+But the real question is outcomes.
+
+13
+00:01:43.34 --> 00:01:49.88
+Our agent-loop harness runs the cleaned output through a deterministic executor and scores utility and hijack together.
+
+14
+00:01:49.92 --> 00:01:56.92
+On benign documents: utility one hundred percent. On canonical attacks: hijack success one point three percent, the best of four systems.
+
+15
+00:02:01.86 --> 00:02:07.24
+A guard that strips everything wins escape and loses utility. We publish both columns.
+
+16
+00:02:08.76 --> 00:02:11.07
+One corpus, one family, all open.
+
+17
+00:02:12.79 --> 00:02:19.79
+A one hundred thirty-five million parameter multilingual span model, sub-million char experts, the one point seven million foundational model, and fm-v6.
+
+18
+00:02:25.04 --> 00:02:32.04
+Every weight, every run record, every evaluation, on Hugging Face. Try it live in the demo Space, no install.
+
+19
+00:02:35.25 --> 00:02:39.86
+Everything here is fictional data, committed, and re-verifiable. Tests green, Apache two.
+
+20
+00:02:43.54 --> 00:02:50.54
+SpanGuard version six: strip the attack, keep the data, with a bound. GitHub, models, and the live demo are linked below.
