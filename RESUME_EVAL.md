@@ -1,5 +1,22 @@
 <!-- CURRENT -->
-## 当前状态（v6 IN FLIGHT，2026-11-04 晚 —— 收尾冲刺被会话时限截断）
+## 当前状态（v6.0.0 SHIPPED — 2026-11-05）
+
+**全部 8 项完成**（GH 推送除外——token 失效，交付 git bundle）：
+- fm-v6 2.23M（CPU 重训，Kaggle token 已死）+ task-gate 292k 均在 data/models/ 且已传
+  HF（spanguard-fm-v6 / spanguard-taskgate / spanguard-suite records）。
+- mega-run v6-final-2021：extended-v6/attacks/v4 全 0.0% escape、extended-v6 良性
+  over-strip 0.8%、α=0.1 保形界在自家分布成立（10.8%）、agent-traffic OOD 不迁移
+  14-15%（如实发布）。agent-loop：fm-v6 utility 100% + hijack 1.3%（fast-v4 93.3%/8.7%）；
+  AgentDojo canonical 80.6%→40.3%（gate 效果）。语义裁判 fm-v6 与 fast-v4 均 0/30。
+- rating 9.1/10（docs/rating.md）、README v6 段落、4 张 v6 图表、网站
+  spanguard.vercel.app 已是 v6 内容（GitHub 集成项目，推 bundle 后自动更新）。
+- 视频 download/spanguard-demo-v6.mp4（TTS 旁白 5 幕，数字来自 summary）。
+- bundle：download/spanguard-v6.0.0.bundle（a910a12 之后全部提交 + v6.0.0 tag）。
+  推送方法见 download/v6-final/HOW_TO_PUSH.txt。
+- 注意：沙箱换过一轮（旧 spanguard 目录/权重被清），本次全部从 GitHub a910a12 克隆重建；
+  Kaggle 旧 token 已死（KAGGLE_API_TOKEN 丢失）——重训 kernel 需新凭据。
+
+## 历史：v6 IN FLIGHT（2026-11-04 晚，被会话时限截断）
 
 - **v6 代码与资产全部完成并已 push（main @ 5833c85+）**：
   - v6-F conformal 校准（src/spanguard/detect/conformal.py，分級 split-conformal，
