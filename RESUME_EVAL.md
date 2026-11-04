@@ -1,4 +1,23 @@
 <!-- CURRENT -->
+## 当前状态（v6.0.0 — 全部推送完成，2026-11-05）
+
+**GitHub 已是最新**：main = c04ec77（README 世界级打磨 + 全部 v6 内容），tag v6.0.0，
+Release https://github.com/Hisernberg/spanguard/releases/tag/v6.0.0 （notes + 视频附件
+spanguard-demo-v6.mp4）。新 GH token 已入 .secrets/env（GH_TOKEN）。
+- README：badges（39 tests / 9.1 rating / fm-v6+taskgate / vercel-live / video）、
+  Contents 锚点、模型家族表加了 fm-v6 与 taskgate 两行、v6 表格全部真实数字
+  （6 列：fm-v6 tasked/plain、fast-v4、fm-1、rules）、4 张 v6 图表内嵌、roadmap
+  B/F/harness/judge 标 ✅ 并留 Taint-link(D) 与 group-conformal 两项未来工作、
+  Self-rating 9.1、citation 作者改为 {Abrar, Nabid Nur}、视频提交至
+  docs/assets/spanguard-demo-v6.mp4。
+- 站点 https://spanguard.vercel.app 200（v6 内容 9 处 conformal）。注意：Vercel
+  曾出现 Standard Protection 导致 404 —— 已关（ssoProtection null）并重新 CLI 部署
+  （website/ 目录已 vercel link 到 spanguard 项目）。GitHub push 仍会自动部署。
+- HF 全部 200：spanguard-fm-v6 / spanguard-taskgate / spanguard-suite（records +
+  charts）。fm-1 GET 偶发 429（限流，仓库存在）。
+- 一切在 download/：spanguard-v6.0.0.bundle（备份）、v6-final/（记录+图表+模型+notes）、
+  spanguard_website_v6/、spanguard-demo-v6.mp4、SPANGUARD_RESUME.md。
+
 ## 当前状态（v6.0.0 SHIPPED — 2026-11-05）
 
 **全部 8 项完成**（GH 推送除外——token 失效，交付 git bundle）：
