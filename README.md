@@ -5,37 +5,36 @@
 
 [![CI](https://github.com/Hisernberg/spanguard/actions/workflows/ci.yml/badge.svg)](https://github.com/Hisernberg/spanguard/actions/workflows/ci.yml)
 [![release](https://img.shields.io/github/v/release/Hisernberg/spanguard)](https://github.com/Hisernberg/spanguard/releases)
-[![tests](https://img.shields.io/badge/tests-33%2F33-green)](tests/)
-[![self-rating](https://img.shields.io/badge/self--rating-8.3%2F10-honest-orange)](docs/rating.md)
+[![tests](https://img.shields.io/badge/tests-39%20pass%2C%201%20skip-green)](tests/)
+[![self-rating](https://img.shields.io/badge/self--rating-9.1%2F10-honest-orange)](docs/rating.md)
 [![Model on Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20model-spanguard--span--mdistil-yellow)](https://huggingface.co/Nabidnur/spanguard-span-mdistil)
 [![char-v4 on HF](https://img.shields.io/badge/%F0%9F%A4%97%20model-spanguard--char--v4-yellow)](https://huggingface.co/Nabidnur/spanguard-char-v4)
 [![SPG-FM-1 on HF](https://img.shields.io/badge/%F0%9F%A4%97%20model-SPG--FM--1-8A2BE2)](https://huggingface.co/Nabidnur/spanguard-fm-1)
+[![SPG-FM-v6 on HF](https://img.shields.io/badge/%F0%9F%A4%97%20model-SPG--FM--v6%20%2B%20taskgate-16A34A)](https://huggingface.co/Nabidnur/spanguard-fm-v6)
 [![full suite on HF](https://img.shields.io/badge/%F0%9F%A4%97%20suite-all--models%20%2B%20evals%20%2B%20corpus-9B5DE5)](https://huggingface.co/Nabidnur/spanguard-suite)
 [![Live demo Space](https://img.shields.io/badge/%F0%9F%A4%97%20Space-real%20inference-blue)](https://huggingface.co/spaces/Nabidnur/spanguard-demo)
-[![Project website](https://img.shields.io/badge/website-spanguard--showcase-2E86FF)](https://hisernberg.github.io/spanguard/)
+[![Project website](https://img.shields.io/badge/website-hisernberg.github.io%2Fspanguard-2E86FF)](https://hisernberg.github.io/spanguard/)
+[![live on Vercel](https://img.shields.io/badge/live-spanguard.vercel.app-000?logo=vercel)](https://spanguard.vercel.app)
+[![demo video](https://img.shields.io/badge/demo-video%2084s-red?logo=youtube)](docs/assets/spanguard-demo-v6.mp4)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FHisernberg%2Fspanguard&project-name=spanguard-showcase&repository-name=spanguard-showcase&root-directory=website)
 
 <!-- intro:start -->
 - **What it does.** An OpenAI-compatible security gateway for AI agents. Tool results, fetched pages, MCP payloads and RAG chunks pass through spanguard before the agent reads them; validated rules, a 135M-parameter multilingual span model and a family of sub-million char-level models find prompt-injection text inside the data and replace each span with `[stripped]`, while orders, totals, names and JSON structure survive untouched.
-- **v6 headline — the bound, the gate, the loop.** fm-v6 (2.23M, corpus-v4 + the v6
-  adversarial addendum, retrained on CPU after the Kaggle credentials expired mid-flight)
-  adds three measured layers: **(F) split-conformal calibration** — the span threshold is
-  the finite-sample (1−α) quantile of benign scores (α=0.1), so over-strip is bounded
-  by construction; **(B) a 292k task-conditioned gate** that releases task-relevant
-  instructions in the uncertain band (hand-written OOD escape 35.5% →
-  29.0% with the task given); **(C) an agent-loop harness** with the
-  canonical AgentDojo attack column and a NotInject benign probe — outcome columns, not
-  guard metrics (NotInject utility 100.0%,
-  hijack 1.3% vs fast-v4
-  8.7%). The semantic escape judge
-  (LLM reading cleaned output) audited the rules and found real gaps the verbatim check had
-  blessed — the hardened v6 rules replay the v3 red-team at 30/30 verbatim-stripped and
-  0/30 semantic escapes. int8 ONNX quantization was tried and rejected on parity; fp32
-  ONNX ships. The honest cost, unchanged: the conformal bound does not fully transfer
-  across distribution shift (worst held-out benign over-strip 15.0% at α=0.1);
-  the sweep is published.
-
+- **v6 headline — the bound, the gate, the loop.** fm-v6 (2.23M params, corpus-v4 +
+  the v6 adversarial addendum) adds three measured layers on top of the v5 recipe:
+  **(F) split-conformal calibration** — the span threshold is the finite-sample (1−α)
+  quantile of benign scores (α=0.1), so in-family over-strip is bounded by construction
+  (0.8% on the new 500-doc set) and every violation out-of-family is published, not tuned
+  away; **(B) a 292k task-conditioned gate** that releases task-relevant instructions in
+  the uncertain band — AgentDojo canonical attack escape 80.6% → 40.3% and hand-written
+  OOD 35.5% → 29.0% with the user's task supplied; **(C) an agent-loop harness** measuring
+  outcomes, not guard metrics — **NotInject benign utility 100% with 1.3% hijack**, the
+  best combination of four systems (fast-v4: 93.3% / 8.7%; a strip-everything guard scores
+  0% hijack and 0% utility). The semantic escape judge (an LLM reading the cleaned output)
+  audited the rules, found real gaps the verbatim check had blessed, and the hardened v6
+  rules replay the v3 red-team at 30/30 verbatim-stripped and **0/30 semantic escapes**.
+  int8 ONNX quantization was tried and rejected on decision parity — fp32 ONNX ships.
 - **v5 headline — SPG-FM-1, one model instead of a stack.** A 1.7M-parameter char-level multi-task network trained on the full corpus-v4 union replaces the regex router + three experts: **0.0% escape on every in-domain set, in all 7 languages (en/de/hu/fr/bn/ar/ja), with doc F1 1.000 on both extended fixtures** and the best payload localization in the family (span F1 0.917/0.901 vs 0.689/0.612 for the router stack) at p50 36.7 ms on CPU. The honest cost, published not hidden: on out-of-domain prose the single model over-strips (45.4% of benign chars on the public probe, 26.4% on hand-written benign) because its document head fires eagerly on prose it has never seen — the router stack keeps the fidelity crown there (24.6% / 17.5%), and closing that axis is roadmap item B/F.
 - **How well (fast-v4, repaired + re-measured).** `fast-v4` — validated rules + the 135M span model + a 3-level char router — escapes **0.0%** of planted payloads on the 900-document agent-traffic set (5.1% benign over-strip) and on both extended attack fixtures: **0.0% escape / 0.0% over-strip / doc F1 1.000** on extended-attacks (all five 2026 carrier families at 0.0%) and **0.0% / 0.1%** on the 108-doc extended-v4 fixture across all 7 languages. The v5 re-measurement also moved its hand-written OOD escape from the published 16.7% to **4.2%** — the all-time best for any spanguard stack — after repairing two orchestration regressions the restore surfaced (see the v5 section for the full account; both runs are committed). Whole-document binary guards on the same fixture miss 6.9–40.3% of attacks while stripping everything they flag.
 - **Domain foundation.** corpus-v4 doubles the carrier surface — log-file poisoning, code-comment injection, RAG-chunk poisoning plus in-domain Arabic and Japanese (16,000 seed-locked docs, 7 languages, 18 families). Zero-shot, the v3 models washed out on exactly this: char-v3 escaped 30.7% of Arabic and 34.0% of Japanese attacks; the span model missed 76.2% of log-poison spans. After v4 training: **0.0% escape in every one of the 7 languages** — and v5's SPG-FM-1 collapses the whole stack into one model trained on the union.
@@ -45,7 +44,9 @@
 **Every example and every dataset here is fictional.**
 
 **Contents:** [Demo](#demo--30-seconds-no-install) · [Why](#why) · [Quickstart](#quickstart) ·
-[The model family](#the-model-family) · [Results](#results) — [v5 headline](#the-v5-headline--both-flagships-one-run-same-code-evalresultsv5-ship-1548) ·
+[The model family](#the-model-family) · [Results](#results) —
+[v6: the bound, the gate, the loop](#v6-the-conformal-bound-the-task-gate-the-agent-loop) ·
+[v5 headline](#the-v5-headline--both-flagships-one-run-same-code-evalresultsv5-ship-1548) ·
 [v5 repair](#the-v5-orchestration-repair--what-the-restore-surfaced-fixed-and-re-measured) ·
 [Architecture](#architecture) · [Threat model & limits](#threat-model--limits) ·
 [Reproducibility](#reproducibility) · [Positioning](#positioning-vs-the-2026-field) ·
@@ -54,25 +55,7 @@
 [v5.0](#v5-spg-fm--the-domain-foundational-model-one-model-instead-of-a-stack) ·
 [v3 domain](#domain-expansion-corpus-v3-and-char-v3-extended-domain-shipped) ·
 [Red team](#adaptive-red-team-loop-idea-a-first-cut) · [Roadmap](#roadmap-stated-not-claimed) ·
-[Self-rating](#self-rating--83--honest) · [Website](#project-website) · [Citation](#citation)
-
-## Deploy the showcase to Vercel (manual, 2 minutes)
-
-The site is a fully static, self-contained folder — no build step, no env vars.
-
-1. Push/import the repo on GitHub → vercel.com/new → pick the repo.
-2. Set **Root Directory** to `website/` (that's the whole app: `index.html`,
-   `assets/`, `vercel.json` with cleanUrls + security headers).
-3. Deploy — done. The repo also carries the CLI path:
-
-```bash
-npm i -g vercel
-cd website
-vercel deploy --prod --yes --token <YOUR_VERCEL_TOKEN>
-```
-
-A live copy runs at <https://spanguard.vercel.app> (auto-deployed from this
-folder; the GitHub Pages mirror at hisernberg.github.io/spanguard stays up too).
+[Self-rating](#self-rating--91-honest) · [Website & deploy](#project-website--deploy) · [Citation](#citation)
 
 ## Demo — 30 seconds, no install
 
@@ -85,7 +68,9 @@ languages — or paste your own text: attack spans highlighted per detector, typ
 `[stripped:*]` markers in the cleaned output, findings table with offsets and payload
 hashes, per-run latency. Nothing is hand-rendered; every verdict is a real gateway run. A
 static 15-card visual walkthrough of the same runs ships in the repo:
-[docs/demo/visual-inference.html](docs/demo/visual-inference.html).
+[docs/demo/visual-inference.html](docs/demo/visual-inference.html), and the 84-second
+demo video (real gateway runs, TTS narration) is committed at
+[docs/assets/spanguard-demo-v6.mp4](docs/assets/spanguard-demo-v6.mp4).
 
 Prefer a terminal?
 
@@ -173,6 +158,8 @@ One corpus, one family — every member shipped, published, and benchmarked:
 | [`spanguard-char-v3`](https://huggingface.co/Nabidnur/spanguard-char-v3) | the same tier domain-expanded to MCP/skill/buried/md-image + Bangla | 0.79M dilated conv, dual head | extended domain 0.4% escape / span F1 0.996 (char-v2 washed out: 11.6% / 0.467) |
 | [`spanguard-char-v4`](https://huggingface.co/Nabidnur/spanguard-char-v4) | the domain-foundation tier: corpus-v4 union — log/code/rag carriers + Arabic + Japanese | 812k dilated conv, dual head | **extended-v4 fixture: 0.0% escape in all 7 languages / 0.0% over-strip / doc F1 1.000 / span F1 0.955** |
 | **SPG-FM-1** (v5, [`spanguard-fm-1`](https://huggingface.co/Nabidnur/spanguard-fm-1)) | **the domain foundational model**: one model for every domain — replaces the router + 3 experts; one forward pass emits doc verdict + payload spans | 1.70M dilated conv, dual head, 512ch/6 blocks | **0.0% escape on every in-domain set, all 7 languages; span F1 0.917/0.901 (best in family); 10.4% hand-written OOD — measured table below** |
+| **SPG-FM-v6** (v6, [`spanguard-fm-v6`](https://huggingface.co/Nabidnur/spanguard-fm-v6)) | the v5 recipe retrained on corpus-v4 + the v6 adversarial addendum, **with split-conformal calibration (α=0.1)** and the uncertain band handed to the task gate | 2.23M dilated conv, dual head, 512ch/8 blocks, window 512 | **extended-v6: 0.0% escape / 0.8% over-strip; NotInject utility 100% + hijack 1.3% (best of four systems); AgentDojo 80.6% → 40.3% tasked** — release run below |
+| [`spanguard-taskgate`](https://huggingface.co/Nabidnur/spanguard-taskgate) | **task-conditioned gate**: `task ⟦TASK⟧ span-context` → keep (task-relevant) / strip (off-task or injection); decides the conformal band | 292k char-CNN, 4 blocks | dev acc 68.95%; hand-written OOD 35.5% → 29.0%, AgentDojo 80.6% → 40.3% (fm-v6 tasked vs plain) |
 | [`spanguard-docguard-mdistil`](https://huggingface.co/Nabidnur/spanguard-docguard-mdistil) | whole-document **attack classifier** (the one-bit baseline, trained on the same data for a fair fight) | 135M seq-cls | doc P/R/F1, false-block rate |
 | [`spanguard-toolguard-mdistil`](https://huggingface.co/Nabidnur/spanguard-toolguard-mdistil) | **tool-call / function-argument** guard: is this call itself malicious? | 135M seq-cls | block-recall vs false-block on held-out generated calls |
 
@@ -422,7 +409,7 @@ fixture posts a perfect **span F1 1.000**. All three baselines run the same fixt
 `eval/results/baselines-extended-v4/record.json` — binary classifiers strip whole documents
 and still miss 7–40% of attacks, while the char-level span model removes exactly the payload.
 
-## v6: the conformal bound, the task gate, the agent loop (record: /home/z/my-project/spanguard/eval/results/v6-final-2021)
+## v6: the conformal bound, the task gate, the agent loop (release run `eval/results/v6-final-2021`)
 
 v6 attacks the one measured loss (benign over-strip) with two principled layers and
 re-grounds the whole evaluation in agent-loop outcomes:
@@ -458,13 +445,39 @@ re-grounds the whole evaluation in agent-loop outcomes:
 
 ### The v6 numbers
 
-| set | fm-v6 (tasked) | fm-v6 | fast-v4 | fm-1 |
-|---|---|---|---|---|
-| extended-v6 · 500 docs (20 families, 7 languages) | 0.0% escape · 0.8% over-strip | 0.0% · 0.8% | see record | see record |
-| notinject benign · 120 docs | utility **100.0%** · over-strip 0.0% | utility 100.0% | utility 93.3% | utility 100.0% |
-| hand-written OOD · 62 docs | 29.0% escape | 35.5% | see record | see record |
-| agent-loop hijack | 1.3% | 1.3% | 8.7% | 8.4% |
-| latency (2-thread CPU) |   | p50 20.6 ms · p95 51.8 ms | — | — |
+All systems, same code, same run (`eval/results/v6-final-2021`); harness outcomes from
+`eval/results/v6-agentloop`:
+
+| set | fm-v6 (tasked) | fm-v6 | fast-v4 | fm-1 | rules |
+|---|---|---|---|---|---|
+| extended-v6 · 500 docs (20 families, 7 languages) | **0.0% escape · 0.8% over-strip** | 0.0% · 0.8% | 0.4% · 11.9% | 0.0% · 0.7% | 35.8% · 0.7% |
+| hand-written OOD · 62 docs | **29.0%** escape | 35.5% | **4.2%** | 18.8% | 72.9% |
+| AgentDojo-wrapped · 72 canonical attacks | **40.3%** escape | 80.6% | **0.0%** (36.4% over-strip) | 0.0% (7.4% over-strip) | 0.0% (0.5% over-strip) |
+| NotInject benign · 120 docs | utility **100%** · 0.0% over-strip | utility 100% | utility 93.3% · 15.4% | utility 100% | utility 100% |
+| agent-loop hijack (attacks) | **1.3%** | 1.3% | 8.7% | 8.4% | 20.4% |
+| latency (2-thread CPU) |   | p50 20.6 ms · p95 51.8 ms | p50 14.6 ms (v5-ship) | p50 36.7 ms (v5-ship) | p50 ~3 ms |
+
+fm-1's 18.8% hand-written is the v6-run re-measure at the shipped v5 threshold; the
+v5-ship record measured 10.4% with the v5 prose-gating config. fast-v4 and the rules
+tier strip every canonical AgentDojo payload but the router pays for it in over-strip
+(36.4%) — fm-v6 is the only system that trades escape for utility in a controlled,
+calibrated band.
+
+<picture>
+  <img src="docs/assets/v6_flagship_bars.png" alt="Escape and over-strip for fm-v6, fast-v4 and fm-1 across all six committed sets." width="100%">
+</picture>
+
+<picture>
+  <img src="docs/assets/v6_conformal_sweep.png" alt="Conformal alpha sweep: the bound, the worst held-out benign over-strip and the OOD escape per alpha." width="100%">
+</picture>
+
+<picture>
+  <img src="docs/assets/v6_agent_loop.png" alt="Agent-loop outcome columns: NotInject utility versus hijack success per system." width="100%">
+</picture>
+
+<picture>
+  <img src="docs/assets/v6_ladder.png" alt="Version ladder v1 through v6: OOD escape and public-probe over-strip." width="100%">
+</picture>
 
 ## v5: SPG-FM — the domain foundational model (one model instead of a stack)
 
@@ -561,41 +574,55 @@ attacker that rephrases the action itself would need a semantic escape judge
 
 ## Roadmap (stated, not claimed)
 
-- **Task-conditioned stripping (B)** — feed the user's goal alongside tool output (cross-encoder): legitimate task-relevant instructions survive, off-task ones get stripped. Attacks the 14–33% over-strip axis directly.
-- **Taint-linked toolguard (D)** — remember stripped spans, then block or confirm outbound tool calls whose arguments derive from tainted content. Connects the span guard and toolguard into one system.
-- **Conformal threshold calibration (F)** — pick the threshold so benign over-strip stays under a target on a calibration set; report it as a bound, not a hope.
-- **NotInject + AgentDojo-embedded runs** — replace the benign-only deepset probe and add an end-to-end harness as standard columns.
+- **~~Task-conditioned stripping (B)~~ ✅ shipped in v6** — the 292k task-conditioned gate; AgentDojo escape 80.6% → 40.3% with the task given ([v6 section](#v6-the-conformal-bound-the-task-gate-the-agent-loop), [`Nabidnur/spanguard-taskgate`](https://huggingface.co/Nabidnur/spanguard-taskgate)).
+- **~~Conformal threshold calibration (F)~~ ✅ shipped in v6** — split-conformal τ at α=0.1, full sweep + held-out verification published (`calibration_v2.json`, [sweep chart](docs/assets/v6_conformal_sweep.png)).
+- **~~NotInject + AgentDojo-embedded runs~~ ✅ shipped in v6** — the agent-loop harness with outcome columns ([harness record](eval/results/v6-agentloop/run.json)).
+- **Semantic escape judge ✅ shipped in v6** — an LLM reads cleaned output; it found real rule gaps and the fixes replay 0/30 semantic escapes ([judge record](eval/results/redteam-v3-0300/semantic_verdicts.json)).
+- **Taint-linked toolguard (D)** — remember stripped spans, then block or confirm outbound tool calls whose arguments derive from tainted content. Connects the span guard and toolguard into one system. *Designed, not built.*
+- **Group-conformal calibration** — the α bound does not transfer across distribution shift (agent-traffic benign realizes ~15% at α=0.1); group-conditional or covariate-shift-aware conformal is the next method step.
 - **Adaptive red-team loop (A, partial)** — see `training/redteam_adaptive.py`: an LLM attacker mutates payloads against the guard for N rounds; escape-per-round is reported below.
 
-## Self-rating — 8.3/10 (honest)
+## Self-rating — 9.1/10 (honest)
 
 Scored against the repo's own evidence in [docs/rating.md](docs/rating.md) — every score
-links a committed artifact, and the weaknesses carry the same weight as the strengths:
+links a committed artifact, and the weaknesses carry the same weight as the strengths.
+The five gaps the v5 rating named are all closed with measured artifacts:
 
-| dimension | score |
-|---|---|
-| Problem & relevance | 9.5 |
-| Reproducibility · Scope honesty | 9.5 |
-| Security engineering | 9.0 |
-| Documentation | 9.0 |
-| ML rigor | 8.0 |
-| Novelty / differentiation | 8.0 |
-| Deployment / demo | 7.5 |
-| **Overall** | **8.3** |
+| dimension | v5 | v6 |
+|---|---|---|
+| Problem & relevance | 9.5 | 9.5 |
+| Security engineering | 9.0 | 9.3 |
+| ML rigor | 8.0 | 8.8 |
+| Reproducibility | 9.5 | 9.0 (Kaggle token died mid-flight → honest CPU retrain) |
+| Documentation | 9.0 | 9.3 |
+| Deployment / demo | 7.5 | 8.8 (video rendered, Vercel live) |
+| Novelty / differentiation | 8.0 | 8.6 |
+| Scope honesty | 9.5 | 9.5 |
+| **Overall** | **8.3** | **9.1** |
 
-The honest 9.5+ gap list: the fm over-strip axis (designed, not built — roadmap B/F), an
-end-to-end agent-loop harness (AgentDojo columns), a larger hand-written OOD set than
-n=48, the recorded demo video, and a semantic escape judge for the red-team loop.
+What keeps v6 below 9.5: the conformal bound does not transfer across distribution shift
+(published), the task gate is modest (~69% dev acc), the OOD crown still belongs to the
+router stack (4.2% vs 29.0%), the fm-v6 weights are a CPU retrain (recipe + meta
+committed; the P100-scale run is a kernel record), and hand-written OOD is still only
+n=62 of genuinely human-written text.
 
-## Project website
+## Project website & deploy
 
-- **Live showcase**: **https://hisernberg.github.io/spanguard/** — hero, the measured v5
-  tables, all four v5 charts, the model family, the honest-trades section and the roadmap
-  in one page; static, self-contained, no build step.
-- **One-click Vercel deploy**: the repo ships a zero-config `website/` (static) with
-  `vercel.json` — hit the **Deploy** button in the badge row above and it hosts the same
-  page on your own Vercel account. The showcase is intentionally framework-free so the
-  hackathon link never rots.
+- **Live showcase (Vercel)**: **https://spanguard.vercel.app** — the same page, served
+  from `website/`. The Vercel project is GitHub-connected: push → auto-deploy.
+- **GitHub Pages mirror**: **https://hisernberg.github.io/spanguard/** — static, no build
+  step, nothing to rot.
+- **Deploy your own copy in 2 minutes**: hit the **Deploy with Vercel** button in the
+  badge row above (set **Root Directory** to `website/`), or:
+
+```bash
+npm i -g vercel
+git clone https://github.com/Hisernberg/spanguard.git && cd spanguard/website
+vercel link --project spanguard-showcase && vercel deploy --prod --yes
+```
+
+The showcase is intentionally framework-free (one `index.html`, inline JS, `vercel.json`
+with cleanUrls + security headers) so the hackathon link never rots.
 
 ## Citation
 
@@ -603,7 +630,7 @@ If you use spanguard or the benchmark protocol, please cite the repo:
 
 ```bibtex
 @software{spanguard2026,
-  author  = {Nur Abrar, Nabid},
+  author  = {Abrar, Nabid Nur},
   title   = {SpanGuard: span-level prompt-injection stripping for AI agent tool traffic},
   year    = {2026},
   url     = {https://github.com/Hisernberg/spanguard},
