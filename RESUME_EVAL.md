@@ -1,5 +1,36 @@
 <!-- CURRENT -->
-## 当前状态（v5.0.0 SHIPPED，2026-11-04）
+## 当前状态（v5.0.0 FINALIZATION ROUND SHIPPED，2026-11-04）
+
+- **收尾轮全部完成并上线**（main @ 1620958+）：
+  - **测试 33/33 绿**：新增 tests/test_v4_routing.py（is_structured 载体分类、route_v4
+    三级路由、扩展域门控 —— 锁死 v5 编排修复的行为）。
+  - **诚实自评**：docs/rating.md（8.3/10 rubric，逐项证据 + 9.5+ 差距清单），
+    README 有 Self-rating 章节。
+  - **README 世界级升级**：徽章行（release/tests/rating/suite/website/Vercel Deploy
+    按钮）+ TOC + Self-rating + Website 章节。
+  - **黑客松网站已上线**: https://hisernberg.github.io/spanguard/（gh-pages @ 80a1c2c，
+    根路径 = website/ 内容；自包含单页：hero/浏览器内规则引擎 live demo/实测表/4 图/
+    家族表/诚实代价/路线图/60 秒 quickstart；无构建步骤，Apache-2.0）。
+    Vercel 零配置：website/vercel.json + README 顶部 Deploy 按钮
+    （vercel.com/new/clone?...root-directory=website）—— 用户点一下即可部署到自己的 Vercel。
+  - **统一 HF 仓库**: https://huggingface.co/Nabidnur/spanguard-suite（68 文件：
+    models/ 4 个 CPU 级模型权重 + eval/ 4 条 release 记录 + 7 个 fixture + charts/
+    4 PNG + 全套 SVG + corpus/ 清单 + code/ 源码镜像 zip；世界级 suite card；
+    fm-1 从 suite 下载后端到端验证通过）。
+- **⚠️ 沙箱大文件清理器**（本轮重要发现）：/home/z 下 >1MB 的模型权重会在命令间隔
+  被后台清除（data/models/ 两度被清空）。**恢复/使用模型必须单进程内完成**：
+  snapshot_download → 用 → 上传，不落地 /home/z；权重唯一可靠副本在 HF 各仓库。
+- Space（spanguard-demo）仍是 cpu-basic 配额 PAUSED；文件为 v5，配额恢复自动重建。
+
+## 下一步（v6，按价值排序）
+1. fm 过删轴：任务条件化剥离（B）/ conformal 阈值（F）—— fm 唯一输给 fast-v4 的轴。
+2. SPG-FM-Large（3.4M/8 blocks）冲 handwritten OOD 10.4%→<8%（Kaggle ~20 分钟）。
+3. 对抗自训练：red-team 逃逸回流 corpus-v5。
+4. ONNX int8 量化 fm：36.7ms→<5ms，让免费层 Space 可交互。
+5. **最终视频**（用户明确要求，后续版本后录制）：脚本 docs/demo-video-script.md。
+6. NotInject + AgentDojo 列。评分 9.5+ 差距清单见 docs/rating.md。
+
+## 历史：v5.0.0 SHIPPED（2026-11-04 早）
 
 - **v5.0.0 全部完成并发布**：GitHub main @ 865ba00 + release
   https://github.com/Hisernberg/spanguard/releases/tag/v5.0.0（新 PAT 生效，push 恢复）。
