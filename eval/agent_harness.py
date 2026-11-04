@@ -78,8 +78,8 @@ def run(detectors: list[str], tag: str, task: str | None = None) -> Path:
         p = REPO / "eval" / "fixtures" / fx
         if p.exists():
             docs += [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()]
-    print(f"agent-loop docs: {len(docs)} "
-          f"(benign {sum(1 for d in docs if not (d.get('attack') or d.get('spans")))})")
+    n_benign_docs = sum(1 for d in docs if not (d.get("attack") or d.get("spans")))
+    print(f"agent-loop docs: {len(docs)} (benign {n_benign_docs})")
 
     out = {"generated_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
            "kind": "agent-loop", "task": task, "systems": {}}

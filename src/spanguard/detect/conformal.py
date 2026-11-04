@@ -47,7 +47,10 @@ def _resolve_dir(dir_path: str | None) -> Path:
     return p if p.is_absolute() or p.exists() else Path(__file__).parents[3] / key
 
 
-def load_fm(dir_path: str | None = None):
+_CACHE: dict[str, tuple] = {}
+
+
+def _load_fm_uncached(dir_path: str | None = None):
     p = _resolve_dir(dir_path)
     vocab = json.loads((p / "vocab.json").read_text())
     cfg = json.loads((p / "config.json").read_text())["net"]
@@ -56,6 +59,15 @@ def load_fm(dir_path: str | None = None):
     net.eval()
     torch.set_num_threads(2)
     return net, vocab, p
+
+
+def load_fm(dir_path: str | None = None):
+    """Cached loader — the calibration sweep runs thousands of guard() calls."""
+    key = str(_resolve_dir(dir_path))
+    if key in _CACHE:
+        return _CACHE[key]
+    _CACHE[key] = _load_fm_uncached(dir_path)
+    return _CACHE[key]
 
 
 def fm_span_scores(text: str, dir_path: str | None = None, cand_thr: float = CAND_THR):
